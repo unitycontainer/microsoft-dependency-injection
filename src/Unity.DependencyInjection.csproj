@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <PackageId>Unity.DependencyInjection</PackageId>
+    <Description>Unity for Microsoft Dependency Injection framework.</Description>
+    <Copyright>Copyright © Microsoft.Practices.Unity 2017</Copyright>
+    <PackageProjectUrl>https://github.com/unitycontainer</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/unitycontainer/microsoft-dependency-injection</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/unitycontainer/microsoft-dependency-injection/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://avatars1.githubusercontent.com/u/12849707</PackageIconUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>This package is distributed as .NET Standard 1.0 and .NET Framework 4.7 package.</PackageReleaseNotes>
+    <Authors>Microsoft.Practices.Unity</Authors>
+    <Company>Microsoft.Practices.Unity</Company>
+    <RootNamespace>Unity.DependencyInjection</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <TargetFrameworks>netstandard1.0;net47</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <DebugType>Full</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
+    <PackageReference Include="Unity" Version="5.0.2" />
+  </ItemGroup>
+
+</Project>
