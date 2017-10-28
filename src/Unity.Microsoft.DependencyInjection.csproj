@@ -2,8 +2,14 @@
 
   <PropertyGroup>
     <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <PackageReleaseNotes>This package is distributed as .NET Standard 1.0 and .NET Framework 4.7 package.</PackageReleaseNotes>
+    <UnityAbstractionsVersion>2.1.0</UnityAbstractionsVersion>
+    <UnityContainerVersion>5.1.0</UnityContainerVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <FileVersion>$(Version).0</FileVersion>
+    <AssemblyVersion>$(Version).0</AssemblyVersion>
     <PackageId>Unity.DependencyInjection</PackageId>
     <Description>Unity for Microsoft Dependency Injection framework.</Description>
     <Copyright>Copyright © Microsoft.Practices.Unity 2017</Copyright>
@@ -12,10 +18,11 @@
     <PackageLicenseUrl>https://github.com/unitycontainer/microsoft-dependency-injection/blob/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://avatars1.githubusercontent.com/u/12849707</PackageIconUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>This package is distributed as .NET Standard 1.0 and .NET Framework 4.7 package.</PackageReleaseNotes>
     <Authors>Microsoft.Practices.Unity</Authors>
     <Company>Microsoft.Practices.Unity</Company>
     <RootNamespace>Unity.DependencyInjection</RootNamespace>
+    <UnityAbstractions>..\..\Abstractions\src\Unity.Abstractions.csproj</UnityAbstractions>
+    <UnityContainer>..\..\Container\src\Unity.Container.csproj</UnityContainer>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -28,10 +35,27 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <DebugType>Full</DebugType>
   </PropertyGroup>
+  
+
+  <ItemGroup Condition="Exists('$(UnityAbstractions)')">
+    <ProjectReference Include="$(UnityAbstractions)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="Exists('$(UnityContainer)')">
+    <ProjectReference Include="$(UnityContainer)" />
+  </ItemGroup>
+
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
-    <PackageReference Include="Unity" Version="5.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" /> 
+  </ItemGroup>
+
+  <ItemGroup Condition="!Exists('$(UnityAbstractions)')">
+    <PackageReference Include="Unity.Abstractions" Version="$(UnityAbstractionsVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="!Exists('$(UnityContainer)')">
+    <PackageReference Include="Unity.Container" Version="$(UnityContainerVersion)" />
   </ItemGroup>
 
 </Project>
