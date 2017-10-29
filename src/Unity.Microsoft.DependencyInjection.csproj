@@ -10,7 +10,7 @@
   <PropertyGroup>
     <FileVersion>$(Version).0</FileVersion>
     <AssemblyVersion>$(Version).0</AssemblyVersion>
-    <PackageId>Unity.DependencyInjection</PackageId>
+    <PackageId>Unity.Microsoft.DependencyInjection</PackageId>
     <Description>Unity for Microsoft Dependency Injection framework.</Description>
     <Copyright>Copyright © Microsoft.Practices.Unity 2017</Copyright>
     <PackageProjectUrl>https://github.com/unitycontainer</PackageProjectUrl>
