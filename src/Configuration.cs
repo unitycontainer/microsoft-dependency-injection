@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Unity.Injection;
 using Unity.Lifetime;
 
-namespace Unity.DependencyInjection
+namespace Unity.Microsoft.DependencyInjection
 {
   public static class Configuration
   {

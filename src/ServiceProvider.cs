@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Unity.DependencyInjection
+namespace Unity.Microsoft.DependencyInjection
 {
   public class ServiceProvider : IServiceProvider
   {

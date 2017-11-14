@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unity.DependencyInjection", "src\Unity.DependencyInjection.csproj", "{520251C7-14E6-434F-A26E-67E9762635BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unity.DependencyInjection", "src\Unity.Microsoft.DependencyInjection.csproj", "{520251C7-14E6-434F-A26E-67E9762635BD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{DA61FEC3-1E17-4DCF-AC19-A6482A547741}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjection.Tests", "tests\DependencyInjection.Tests.csproj", "{FCC3DAA4-9136-4C55-926D-7DBD5BEDE8D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjection.Tests", "tests\Microsoft.DependencyInjection.Tests.csproj", "{FCC3DAA4-9136-4C55-926D-7DBD5BEDE8D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

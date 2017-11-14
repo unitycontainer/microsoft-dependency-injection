@@ -2,7 +2,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Unity.DependencyInjection
+namespace Unity.Microsoft.DependencyInjection
 {
   public class ServiceScope : IServiceScope
   {

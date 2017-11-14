@@ -20,7 +20,7 @@
     <RepositoryType>git</RepositoryType>
     <Authors>Microsoft.Practices.Unity</Authors>
     <Company>Microsoft.Practices.Unity</Company>
-    <RootNamespace>Unity.DependencyInjection</RootNamespace>
+    <RootNamespace>Unity.Microsoft.DependencyInjection</RootNamespace>
     <UnityAbstractions>..\..\Abstractions\src\Unity.Abstractions.csproj</UnityAbstractions>
     <UnityContainer>..\..\Container\src\Unity.Container.csproj</UnityContainer>
   </PropertyGroup>
