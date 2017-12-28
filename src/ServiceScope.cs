@@ -4,21 +4,33 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Unity.Microsoft.DependencyInjection
 {
-  public class ServiceScope : IServiceScope
-  {
-    private readonly IUnityContainer container;
-
-    public ServiceScope(IUnityContainer container)
+    public class ServiceScope : IServiceScope
     {
-      this.container = container.CreateChildContainer();
-    }
+        private IUnityContainer _container;
+        private ServiceProvider _provider;
 
-    public IServiceProvider ServiceProvider =>
-      container.Resolve<IServiceProvider>();
+        IServiceProvider IServiceScope.ServiceProvider
+        {
+            get
+            {
+                if (_provider == null)
+                    _provider = new ServiceProvider(_container.CreateChildContainer());
+                return _provider;
+            }
+        }
 
-    public void Dispose()
-    {
-      container.Dispose();
+        public ServiceScope(IUnityContainer container)
+        {
+            _container = container;
+        }
+
+        public void Dispose()
+        {
+            var disposable = _provider;
+            _container = null;
+            _provider = null;
+            disposable?.Dispose();
+            GC.SuppressFinalize(this);
+        }
     }
-  }
 }
