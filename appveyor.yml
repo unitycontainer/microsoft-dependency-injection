@@ -1,0 +1,19 @@
+image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
+
+install:
+  - ps: $env:build_version = (Select-Xml -Path ".\package.props" -XPath "/Project/PropertyGroup/Version" | Select-Object -ExpandProperty Node).InnerText
+  - ps: Update-AppveyorBuild -Version "$env:build_version.$env:APPVEYOR_BUILD_NUMBER"
+
+dotnet_csproj:
+  patch: false
+
+before_build:
+- cmd: dotnet restore
+
+build:
+  project: package.sln
+  parallel: true
+  verbosity: minimal
+
