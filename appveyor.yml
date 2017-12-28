@@ -3,8 +3,8 @@ configuration: Release
 platform: Any CPU
 
 install:
-  - ps: $env:build_version = (Select-Xml -Path ".\package.props" -XPath "/Project/PropertyGroup/Version" | Select-Object -ExpandProperty Node).InnerText
-  - ps: Update-AppveyorBuild -Version "$env:build_version.$env:APPVEYOR_BUILD_NUMBER"
+- ps: $env:build_version = (Select-Xml -Path ".\package.props" -XPath "/Project/PropertyGroup/Version" | Select-Object -ExpandProperty Node).InnerText
+- ps: Update-AppveyorBuild -Version "$env:build_version.$env:APPVEYOR_BUILD_NUMBER"
 
 dotnet_csproj:
   patch: false
@@ -17,3 +17,12 @@ build:
   parallel: true
   verbosity: minimal
 
+after_build:
+- choco install opencover.portable
+- choco install codecov
+
+test_script:
+- OpenCover.Console.exe -register:user -target:"C:\Program Files\dotnet\dotnet.exe" -targetargs:"test --framework net47 --verbosity q"
+
+after_test:
+- codecov -f "results.xml" 
