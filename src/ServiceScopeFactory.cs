@@ -1,19 +1,19 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿//using Microsoft.Extensions.DependencyInjection;
 
-namespace Unity.Microsoft.DependencyInjection
-{
-  public class ServiceScopeFactory : IServiceScopeFactory
-  {
-    private readonly IUnityContainer container;
+//namespace Unity.Microsoft.DependencyInjection
+//{
+//  public class ServiceScopeFactory : IServiceScopeFactory
+//  {
+//    private readonly IUnityContainer container;
 
-    public ServiceScopeFactory(IUnityContainer container)
-    {
-      this.container = container;
-    }
+//    public ServiceScopeFactory(IUnityContainer container)
+//    {
+//      this.container = container;
+//    }
 
-    public IServiceScope CreateScope()
-    {
-      return container.Resolve<IServiceScope>();
-    }
-  }
-}
+//    public IServiceScope CreateScope()
+//    {
+//      return container.Resolve<IServiceScope>();
+//    }
+//  }
+//}

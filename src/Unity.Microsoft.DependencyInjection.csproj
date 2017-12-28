@@ -19,17 +19,13 @@
     <RootNamespace>Unity.Microsoft.DependencyInjection</RootNamespace>
     <UnityAbstractions>..\..\Abstractions\src\Unity.Abstractions.csproj</UnityAbstractions>
     <UnityContainer>..\..\Container\src\Unity.Container.csproj</UnityContainer>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <TargetFrameworks>netstandard1.0;net47</TargetFrameworks>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <TargetFramework>netstandard1.0</TargetFramework>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <DebugType>Full</DebugType>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
   
 
@@ -43,7 +39,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" /> 
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" /> 
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('$(UnityAbstractions)')">
@@ -51,7 +47,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('$(UnityContainer)')">
-    <PackageReference Include="Unity.Container" Version="$(UnityContainerVersion)" />
+    <PackageReference Include="Unity.Container" Version="5.5.0" />
   </ItemGroup>
 
 </Project>

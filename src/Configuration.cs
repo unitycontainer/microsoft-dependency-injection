@@ -10,234 +10,139 @@ using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {
-  public static class Configuration
-  {
-    public static void Register(IServiceCollection services, IUnityContainer _container)
+    public static class Configuration
     {
-      _container.RegisterType<IServiceScopeFactory, ServiceScopeFactory>();
-      _container.RegisterType<IServiceScope, ServiceScope>();
-      _container.RegisterType<IServiceProvider, ServiceProvider>();
+        static Aggregates _aggregates;
 
-      RegisterEnumerable(_container);
-
-      HashSet<Type> aggregateTypes = GetAggregateTypes(services);
-
-      MethodInfo registerInstance = RegisterInstance();
-
-      Func<ServiceDescriptor, LifetimeManager> lifetime = GetLifetime();
-
-      // Configure all registrations into Unity
-      foreach (ServiceDescriptor serviceDescriptor in services)
-      {
-        RegisterType(
-          _container,
-          lifetime,
-          serviceDescriptor,
-          aggregateTypes,
-          registerInstance);
-      }
-    }
-
-    private static MethodInfo RegisterInstance()
-    {
-      return
-        typeof(UnityContainerExtensions)
-          .GetRuntimeMethods()
-          .Single(o =>
-            o.IsStatic &&
-            o.IsPublic &&
-            o.IsGenericMethod &&
-            o.Name == "RegisterInstance" &&
-            o.GetParameters().Length == 4);
-    }
-
-    private static HashSet<Type> GetAggregateTypes(IServiceCollection services)
-    {
-      var aggregateTypes = new HashSet<Type>
-      (
-        services.GroupBy
-          (
-            serviceDescriptor => serviceDescriptor.ServiceType,
-            serviceDescriptor => serviceDescriptor
-          )
-          .Where(typeGrouping => typeGrouping.Count() > 1)
-          .Select(type => type.Key)
-      );
-
-      return aggregateTypes;
-    }
-
-    private static void RegisterEnumerable(IUnityContainer _container)
-    {
-      _container.RegisterType
-      (
-        typeof(IEnumerable<>),
-        new InjectionFactory
-        (
-          (container, enumerableType, name) =>
-          {
-            Type type = enumerableType.GenericTypeArguments.Single();
-            Type genericType = type.GetGenericTypeDefinition();
-
-            object[] allInstances = container.ResolveAll(type).Concat
-            (
-              _container.IsRegistered(type) ||
-              type.GenericTypeArguments.Any() &&
-              _container.IsRegistered(genericType)
-                ? new[] {container.Resolve(type)}
-                : new object[] { }
-            )
-            .ToArray();
-
-            return
-              typeof(Enumerable).GetRuntimeMethod("OfType", new[] {typeof(object[])})
-                .MakeGenericMethod(type)
-                .Invoke(null, new object[] {allInstances});
-          }
-        )
-      );
-    }
-
-    private static Func<ServiceDescriptor, LifetimeManager> GetLifetime()
-    {
-      return serviceDescriptor =>
-      {
-        switch (serviceDescriptor.Lifetime)
+        public static IServiceProvider Configure(this IUnityContainer container, IServiceCollection services)
         {
-          case ServiceLifetime.Scoped:
-            return new HierarchicalLifetimeManager();
+            container.AddNewExtension<MDIExtension>();
 
-          case ServiceLifetime.Singleton:
-            return new ContainerControlledLifetimeManager();
+            var provider = new ServiceProvider(container);
 
-          case ServiceLifetime.Transient:
-            return new TransientLifetimeManager();
+            var aggregateTypes = GetAggregateTypes(services);
 
-          default:
-            throw new NotImplementedException($"Unsupported lifetime manager type '{serviceDescriptor.Lifetime}'");
+            var aggregateList = aggregateTypes.Select(t => new Aggregate(t, container)).ToList();
+            _aggregates = new Aggregates(aggregateList);
+            container.RegisterInstance(_aggregates);
+
+            // Configure all registrations into Unity
+            foreach (var serviceDescriptor in services)
+            {
+                container.RegisterType(serviceDescriptor, _aggregates);
+            }
+            _aggregates.Register();
+
+            container.RegisterInstance<IServiceScopeFactory>(provider);
+            container.RegisterType<TransientObjectPool>(new HierarchicalLifetimeManager());
+            
+            return provider;
         }
-      };
-    }
 
-    private static void RegisterType(
-      IUnityContainer _container,
-      Func<ServiceDescriptor, LifetimeManager> fetchLifetime,
-      ServiceDescriptor serviceDescriptor,
-      ICollection<Type> aggregateTypes,
-      MethodInfo miRegisterInstanceOpen)
-    {
-      LifetimeManager lifetimeManager = fetchLifetime(serviceDescriptor);
-      bool isAggregateType = aggregateTypes.Contains(serviceDescriptor.ServiceType);
-
-      if (serviceDescriptor.ImplementationType != null)
-      {
-        RegisterImplementation(_container, serviceDescriptor, isAggregateType, lifetimeManager);
-      }
-      else if (serviceDescriptor.ImplementationFactory != null)
-      {
-        RegisterFactory(_container, serviceDescriptor, isAggregateType, lifetimeManager);
-      }
-      else if (serviceDescriptor.ImplementationInstance != null)
-      {
-        RegisterSingleton(_container, serviceDescriptor, miRegisterInstanceOpen, isAggregateType, lifetimeManager);
-      }
-      else
-      {
-        throw new InvalidOperationException("Unsupported registration type");
-      }
-    }
-
-    private static void RegisterImplementation(
-      IUnityContainer _container,
-      ServiceDescriptor serviceDescriptor,
-      bool isAggregateType,
-      LifetimeManager lifetimeManager)
-    {
-      if (isAggregateType)
-      {
-        _container.RegisterType(
-          serviceDescriptor.ServiceType,
-          serviceDescriptor.ImplementationType,
-          serviceDescriptor.ImplementationType.AssemblyQualifiedName,
-          lifetimeManager);
-      }
-      else
-      {
-        _container.RegisterType(
-          serviceDescriptor.ServiceType,
-          serviceDescriptor.ImplementationType,
-          lifetimeManager);
-      }
-    }
-
-    private static void RegisterFactory(
-      IUnityContainer _container,
-      ServiceDescriptor serviceDescriptor,
-      bool isAggregateType,
-      LifetimeManager lifetimeManager)
-    {
-      if (isAggregateType)
-      {
-        _container.RegisterType
-        (
-          serviceDescriptor.ServiceType,
-          serviceDescriptor.ImplementationType.AssemblyQualifiedName,
-          lifetimeManager,
-          new InjectionFactory
-          (
-            container =>
+        internal static void Register(this IUnityContainer container,
+            ServiceDescriptor service, string qualifier)
+        {
+            if (service.ImplementationType != null)
             {
-              var serviceProvider = container.Resolve<IServiceProvider>();
-              object instance = serviceDescriptor.ImplementationFactory(serviceProvider);
-              return instance;
+                RegisterImplementation(container, service, qualifier);
             }
-          )
-        );
-      }
-      else
-      {
-        _container.RegisterType
-        (
-          serviceDescriptor.ServiceType,
-          lifetimeManager,
-          new InjectionFactory
-          (
-            container =>
+            else if (service.ImplementationFactory != null)
             {
-              var serviceProvider = container.Resolve<IServiceProvider>();
-              object instance = serviceDescriptor.ImplementationFactory(serviceProvider);
-              return instance;
+                RegisterFactory(container, service, qualifier);
             }
-          )
-        );
-      }
-    }
-
-    private static void RegisterSingleton(
-      IUnityContainer _container,
-      ServiceDescriptor serviceDescriptor,
-      MethodInfo miRegisterInstanceOpen,
-      bool isAggregateType,
-      LifetimeManager lifetimeManager)
-    {
-      if (isAggregateType)
-      {
-        miRegisterInstanceOpen
-          .MakeGenericMethod(serviceDescriptor.ServiceType)
-          .Invoke(null,
-            new[]
+            else if (service.ImplementationInstance != null)
             {
-              _container, serviceDescriptor.ImplementationType.AssemblyQualifiedName,
-              serviceDescriptor.ImplementationInstance, lifetimeManager
-            });
-      }
-      else
-      {
-        _container.RegisterInstance(
-          serviceDescriptor.ServiceType,
-          serviceDescriptor.ImplementationInstance,
-          lifetimeManager);
-      }
+                RegisterSingleton(container, service, qualifier);
+            }
+            else
+            {
+                throw new InvalidOperationException("Unsupported registration type");
+            }
+        }
+
+        private static HashSet<Type> GetAggregateTypes(IServiceCollection services)
+        {
+            var aggregateTypes = new HashSet<Type>
+                (
+                services.
+                    GroupBy
+                    (
+                        serviceDescriptor => serviceDescriptor.ServiceType,
+                        serviceDescriptor => serviceDescriptor
+                    ).
+                    Where(typeGrouping => typeGrouping.Count() > 1).
+                    Select(type => type.Key)
+                );
+            return aggregateTypes;
+        }
+
+        
+
+        private static void RegisterType(this IUnityContainer container,
+            ServiceDescriptor serviceDescriptor, Aggregates aggregates)
+        {
+            var aggregate = aggregates.Get(serviceDescriptor.ServiceType);
+            if (aggregate != null)
+                aggregate.AddService(serviceDescriptor);
+            else
+                container.Register(serviceDescriptor, null);
+        }
+
+        private static void RegisterImplementation(this IUnityContainer container,
+            ServiceDescriptor serviceDescriptor, string qualifier)
+        {
+            container.RegisterType(serviceDescriptor.ServiceType,
+                serviceDescriptor.ImplementationType,
+                qualifier,
+                serviceDescriptor.GetLifetime(container));
+        }
+
+        private static void RegisterFactory(this IUnityContainer container,
+            ServiceDescriptor serviceDescriptor, string qualifier)
+        {
+            container.RegisterType(serviceDescriptor.ServiceType, qualifier, serviceDescriptor.GetLifetime(container),
+                new InjectionFactory(scope =>
+                {
+                    var serviceProvider = serviceDescriptor.Lifetime == ServiceLifetime.Scoped
+                        ? scope.Resolve<IServiceProvider>()
+                        : container.Resolve<IServiceProvider>();
+                    var instance = serviceDescriptor.ImplementationFactory(serviceProvider);
+                    return instance;
+                }));
+        }
+
+        private static void RegisterSingleton(this IUnityContainer container,
+            ServiceDescriptor serviceDescriptor, string qualifier)
+        {
+            container.RegisterInstance(serviceDescriptor.ServiceType,
+                qualifier,
+                serviceDescriptor.ImplementationInstance,
+                serviceDescriptor.GetLifetime(container));
+        }
+
+        internal static bool CanResolve(this IUnityContainer container, Type type)
+        {
+            if (type.IsClass && !type.IsAbstract)
+            {
+                if (typeof(Delegate).IsAssignableFrom(type) || typeof(string) == type || type.IsEnum
+                    || type.IsArray || type.IsPrimitive)
+                {
+                    return container.IsRegistered(type);
+                }
+                return true;
+            }
+
+            if (type.IsGenericType)
+            {
+                var gerericType = type.GetGenericTypeDefinition();
+                if ((gerericType == typeof(IEnumerable<>)) ||
+                    container.IsRegistered(gerericType))
+                {
+                    return true;
+                }
+            }
+
+            return container.IsRegistered(type);
+        }
     }
-  }
 }
