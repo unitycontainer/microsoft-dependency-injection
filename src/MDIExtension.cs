@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Unity.Extension;
+﻿using Unity.Extension;
 using Unity.Policy;
 
 namespace Unity.Microsoft.DependencyInjection
