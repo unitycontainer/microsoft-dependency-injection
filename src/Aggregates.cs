@@ -20,7 +20,10 @@ namespace Unity.Microsoft.DependencyInjection
 
         public void Register()
         {
-            Types.ForEach(t => t.Register());
+            foreach (var type in Types)
+            {
+                type.Register();
+            }
         }
     }
 }
