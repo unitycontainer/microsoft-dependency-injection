@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Version>1.0.0</Version>
-    <PackageReleaseNotes>This package is distributed as .NET Standard 1.0 package.</PackageReleaseNotes>
+    <PackageReleaseNotes>This package is distributed as .NET Standard 1.0 package. It is compatible with Microsoft.Extensions.DependencyInjection.Abstractions specification.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
