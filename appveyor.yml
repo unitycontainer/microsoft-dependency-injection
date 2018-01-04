@@ -26,3 +26,7 @@ test_script:
 
 after_test:
 - codecov -f "results.xml" 
+
+artifacts:
+- path: '**\Unity.*.nupkg'
+  name: 'Unity'
