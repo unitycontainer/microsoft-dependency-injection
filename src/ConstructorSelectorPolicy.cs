@@ -1,5 +1,4 @@
-﻿using Unity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -39,12 +38,13 @@ namespace Unity.Microsoft.DependencyInjection
             IEnumerable<ConstructorInfo> constructors = context.BuildKey.Type.GetTypeInfo()
                 .DeclaredConstructors.Where(c => (!c.IsStatic) && c.IsPublic);
 
-            ConstructorInfo[] injectionConstructors = constructors
+            var constructorInfos = constructors as ConstructorInfo[] ?? constructors.ToArray();
+            ConstructorInfo[] injectionConstructors = constructorInfos
                 .Where(ctor => ctor.IsDefined(typeOfAttribute, true))
                 .ToArray();
             switch (injectionConstructors.Length)
             {
-                case 0: return FindSingleConstructor(constructors) ?? Other(constructors.ToArray(), context);
+                case 0: return FindSingleConstructor(constructorInfos) ?? Other(constructorInfos.ToArray(), context);
                 case 1: return injectionConstructors[0];
                 default:
                     throw new InvalidOperationException(
@@ -77,8 +77,8 @@ namespace Unity.Microsoft.DependencyInjection
                 var qtd = b.GetParameters().Length.CompareTo(a.GetParameters().Length);
                 if (qtd == 0)
                 {
-                    return b.GetParameters().Sum(p => p.ParameterType.IsInterface ? 1 : 0)
-                        .CompareTo(a.GetParameters().Sum(p => p.ParameterType.IsInterface ? 1 : 0));
+                    return b.GetParameters().Sum(p => p.ParameterType.GetTypeInfo().IsInterface ? 1 : 0)
+                        .CompareTo(a.GetParameters().Sum(p => p.ParameterType.GetTypeInfo().IsInterface ? 1 : 0));
                 }
                 return qtd;
             });
@@ -110,8 +110,8 @@ namespace Unity.Microsoft.DependencyInjection
 
                         if (!bestConstructorParameterTypes.IsSupersetOf(parameters.Select(p => p.ParameterType)))
                         {
-                            if (bestConstructorParameterTypes.All(p => p.IsInterface)
-                                && !parameters.All(p => p.ParameterType.IsInterface))
+                            if (bestConstructorParameterTypes.All(p => p.GetTypeInfo().IsInterface)
+                                && !parameters.All(p => p.ParameterType.GetTypeInfo().IsInterface))
                                 return bestConstructor;
 
                             var msg = $"Falha ao procurar um construtor para {context.BuildKey.Type.FullName}\n" +

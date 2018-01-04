@@ -2,9 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity;
+using System.Reflection;
 using Unity.Injection;
-using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {
@@ -39,20 +38,20 @@ namespace Unity.Microsoft.DependencyInjection
             Container.RegisterType(Type, Last.GetLifetime(Container),
                 new InjectionFactory((c, t, s) =>
                 {
-                    if (Last.ServiceType.IsGenericTypeDefinition)
+                    if (Last.ServiceType.GetTypeInfo().IsGenericTypeDefinition)
                         return c.Resolve(t, Last.GetImplementationType().FullName);
                     var instance = Resolve(c);
                     return instance;
                 }));
 
             var enumType = typeof(IEnumerable<>).MakeGenericType(Type);
-            Container.RegisterType(enumType, new HierarchicalTransientLifetimeManager(Container),
+            Container.RegisterType(enumType, new HierarchicalTransientLifetimeManager(),
                 new InjectionFactory(c =>
                 {
                     List<object> instances = new List<object>();
                     foreach (var serv in Services)
                     {
-                        if (!serv.ServiceType.IsGenericTypeDefinition)
+                        if (!serv.ServiceType.GetTypeInfo().IsGenericTypeDefinition)
                         {
                             var qualifier = serv.GetImplementationType().FullName;
                             var instance = Container.Resolve(serv.ServiceType, qualifier);
@@ -60,7 +59,8 @@ namespace Unity.Microsoft.DependencyInjection
                         }
                     }
                     return typeof(Enumerable)
-                        .GetMethod("Cast")
+                        .GetTypeInfo()
+                        .GetDeclaredMethod("Cast")
                         .MakeGenericMethod(Type)
                         .Invoke(null, new[] { instances });
                 }));

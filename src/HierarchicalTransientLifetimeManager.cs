@@ -1,24 +1,19 @@
-﻿using Unity.Lifetime;
+﻿using System;
+using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {
     /// <summary>
     /// A special lifetime manager which works like <see cref="TransienLifetimeManager"/>,
-    /// except that in the presence of child containers, each child gets it's own instance
-    /// of the object, instead of sharing one in the common parent.
+    /// except it makes container remember all Disposable objects it created. Once container
+    /// is disposed all these objects are disposed as well.
     /// </summary>
-    internal class HierarchicalTransientLifetimeManager : HierarchicalLifetimeManager
+    internal class HierarchicalTransientLifetimeManager : LifetimeManager
     {
-        private IUnityContainer _container;
-
-        public HierarchicalTransientLifetimeManager(IUnityContainer container)
-        {
-            _container = container;
-        }
-
         public override void SetValue(object newValue, ILifetimeContainer container = null)
         {
-            _container.Resolve<TransientObjectPool>().Add(newValue);
+            if (newValue is IDisposable disposable)
+                container?.Add(disposable);
         }
 
         public override object GetValue(ILifetimeContainer container = null)
@@ -26,10 +21,15 @@ namespace Unity.Microsoft.DependencyInjection
             return null;
         }
 
-        protected override void Dispose(bool disposing)
+        public override void RemoveValue(ILifetimeContainer container = null)
         {
-            _container = null;
-            base.Dispose(disposing);
         }
+
+        protected override LifetimeManager OnCreateLifetimeManager()
+        {
+            return this;
+        }
+
+        public override bool InUse { get => false; set => base.InUse = false; }
     }
 }

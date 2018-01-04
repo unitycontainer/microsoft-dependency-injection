@@ -1,28 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-
 using Unity.Injection;
-using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {
-    public static class Configuration
+    internal static class Configuration
     {
-        static Aggregates _aggregates;
+        static List<Aggregate> _aggregates;
 
-        public static IServiceProvider Configure(this IUnityContainer container, IServiceCollection services)
+        internal static void Configure(this IUnityContainer container, IServiceCollection services)
         {
-            container.AddNewExtension<MDIExtension>();
-
-            var provider = new ServiceProvider(container);
-
             var aggregateTypes = GetAggregateTypes(services);
 
-            var aggregateList = aggregateTypes.Select(t => new Aggregate(t, container)).ToList();
-            _aggregates = new Aggregates(aggregateList);
+            _aggregates = aggregateTypes.Select(t => new Aggregate(t, container)).ToList();
             container.RegisterInstance(_aggregates);
 
             // Configure all registrations into Unity
@@ -30,12 +23,11 @@ namespace Unity.Microsoft.DependencyInjection
             {
                 container.RegisterType(serviceDescriptor, _aggregates);
             }
-            _aggregates.Register();
 
-            container.RegisterInstance<IServiceScopeFactory>(provider);
-            container.RegisterType<TransientObjectPool>(new HierarchicalLifetimeManager());
-            
-            return provider;
+            foreach (var type in _aggregates)
+            {
+                type.Register();
+            }
         }
 
         internal static void Register(this IUnityContainer container,
@@ -61,26 +53,20 @@ namespace Unity.Microsoft.DependencyInjection
 
         private static HashSet<Type> GetAggregateTypes(IServiceCollection services)
         {
-            var aggregateTypes = new HashSet<Type>
-                (
-                services.
-                    GroupBy
-                    (
-                        serviceDescriptor => serviceDescriptor.ServiceType,
-                        serviceDescriptor => serviceDescriptor
-                    ).
-                    Where(typeGrouping => typeGrouping.Count() > 1).
-                    Select(type => type.Key)
-                );
-            return aggregateTypes;
+            var enumerable = services.GroupBy(serviceDescriptor => serviceDescriptor.ServiceType,
+                                              serviceDescriptor => serviceDescriptor)
+                                     .Where(typeGrouping => typeGrouping.Count() > 1)
+                                     .Select(type => type.Key);
+
+            return new HashSet<Type>(enumerable);
         }
 
         
 
         private static void RegisterType(this IUnityContainer container,
-            ServiceDescriptor serviceDescriptor, Aggregates aggregates)
+            ServiceDescriptor serviceDescriptor, List<Aggregate> aggregates)
         {
-            var aggregate = aggregates.Get(serviceDescriptor.ServiceType);
+            var aggregate = aggregates.FirstOrDefault(a => a.Type == serviceDescriptor.ServiceType);
             if (aggregate != null)
                 aggregate.AddService(serviceDescriptor);
             else
@@ -121,17 +107,19 @@ namespace Unity.Microsoft.DependencyInjection
 
         internal static bool CanResolve(this IUnityContainer container, Type type)
         {
-            if (type.IsClass && !type.IsAbstract)
+            var info = type.GetTypeInfo();
+
+            if (info.IsClass && !info.IsAbstract)
             {
-                if (typeof(Delegate).IsAssignableFrom(type) || typeof(string) == type || type.IsEnum
-                    || type.IsArray || type.IsPrimitive)
+                if (typeof(Delegate).GetTypeInfo().IsAssignableFrom(info) || typeof(string) == type || info.IsEnum
+                    || type.IsArray || info.IsPrimitive)
                 {
                     return container.IsRegistered(type);
                 }
                 return true;
             }
 
-            if (type.IsGenericType)
+            if (info.IsGenericType)
             {
                 var gerericType = type.GetGenericTypeDefinition();
                 if ((gerericType == typeof(IEnumerable<>)) ||

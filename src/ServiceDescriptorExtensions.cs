@@ -33,7 +33,7 @@ namespace Unity.Microsoft.DependencyInjection
                 case ServiceLifetime.Singleton:
                     return new ContainerControlledLifetimeManager();
                 case ServiceLifetime.Transient:
-                    return new HierarchicalTransientLifetimeManager(container);
+                    return new HierarchicalTransientLifetimeManager();
                 default:
                     throw new NotImplementedException(
                         $"Unsupported lifetime manager type '{serviceDescriptor.Lifetime}'");

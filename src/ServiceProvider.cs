@@ -1,29 +1,33 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {
-    public class ServiceProvider : IServiceProvider, IServiceScopeFactory, IDisposable
+    public class ServiceProvider : IServiceProvider, IServiceScopeFactory, IServiceScope, IDisposable
     {
-        protected IUnityContainer container;
-        private static Type enumerableType = typeof(IEnumerable<>);
+        protected IUnityContainer _container;
 
-        public ServiceProvider(IUnityContainer container)
+
+        internal ServiceProvider(IUnityContainer container)
         {
-            this.container = container; //ExternallyControlledLifetimeManager
-            container.RegisterInstance<IServiceProvider>(this, new ExternallyControlledLifetimeManager());
+            _container = container;
+            _container.AddNewExtension<MDIExtension>();
+            _container.RegisterInstance<IServiceScope>(this);
+            _container.RegisterInstance<IServiceProvider>(this);
+            _container.RegisterInstance<IServiceScopeFactory>(this);
         }
 
         #region IServiceProvider
 
         public object GetService(Type serviceType)
         {
-            if (!container.CanResolve(serviceType))
-                return null;
-            var instance = container.Resolve(serviceType);
-            return instance;
+            try
+            {
+                return _container.Resolve(serviceType);
+            }
+            catch  { /* Ignore */}
+
+            return null;
         }
 
         #endregion
@@ -33,22 +37,62 @@ namespace Unity.Microsoft.DependencyInjection
 
         public IServiceScope CreateScope()
         {
-            return CreateScope(container);
-        }
-
-        internal static IServiceScope CreateScope(IUnityContainer container)
-        {
-            return new ServiceScope(container);
+            return new ServiceProvider(_container.CreateChildContainer());
         }
 
         #endregion
 
+
+        #region IServiceScope
+
+        IServiceProvider IServiceScope.ServiceProvider => this;
+
+        #endregion
+
+
+        #region ConfigureServices
+
+        public static IServiceProvider ConfigureServices(IServiceCollection services)
+        {
+            var unity = new UnityContainer();
+            unity.Configure(services);    
+            return new ServiceProvider(unity);
+        }
+
+        #endregion
+
+
+        #region Disposable
+
+        ~ServiceProvider()
+        {
+            Dispose(false);
+        }
+
         public void Dispose()
         {
-            IDisposable disposable = container;
-            container = null;
-            disposable?.Dispose();
+            Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool mode)
+        {
+            IDisposable disposable = _container;
+            _container = null;
+            disposable?.Dispose();
+        }
+
+        #endregion
+    }
+
+
+    public static class ServiceProviderExtension
+    {
+        public static IServiceProvider ConfigureServices(this IUnityContainer container, IServiceCollection services)
+        {
+            var unity = container.CreateChildContainer();
+            unity.Configure(services);
+            return new ServiceProvider(unity);
         }
     }
 }
