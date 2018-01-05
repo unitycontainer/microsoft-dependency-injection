@@ -4,4 +4,47 @@
 [![NuGet](https://img.shields.io/nuget/v/Unity.Microsoft.DependencyInjection.svg)](https://www.nuget.org/packages/Unity.Microsoft.DependencyInjection)
 
 # Unity.Microsoft.DependencyInjection
-Unity extension to integrate with Microsoft.Extensions.DependencyInjection compliant systems
+Unity extension to integrate with [Microsoft.Extensions.DependencyInjection.Abstractions](https://github.com/aspnet/DependencyInjection)  compliant systems
+
+## Get Started
+- Reference the `Unity.Microsoft.DependencyInjection` package from NuGet.
+```
+Install-Package Unity.Microsoft.DependencyInjection
+```
+
+## First way:
+- In the `WebHostBuilder` add `ConfigureServices(services => services.AddUnity())` method
+
+```C#
+public static IWebHost BuildWebHost(string[] args) =>
+    WebHost.CreateDefaultBuilder(args)
+        .ConfigureServices(services => services.AddUnity())
+        .UseStartup<Startup>()
+        .Build();
+```
+- Add method to your `Startup` class
+```C#
+public void ConfigureContainer(IUnityContainer container)
+{
+  container.RegisterType<IMyService, MyService>();
+}
+```
+
+## Second way:
+- In the `ConfigureServices` method of your `Startup` class...
+  - Register services from the `IServiceCollection`.
+  - Build your container.
+  - Call `ConfigureServices` extension on `IUnityContainer` and return it.
+
+```C#
+public IServiceProvider ConfigureServices(IServiceCollection services)
+{
+  services.AddMvc();
+  
+  var container = new UnityContainer();
+  
+  container.RegisterType<IMyService, MyService>();
+  
+  return container.ConfigureServices(services);
+}
+```
