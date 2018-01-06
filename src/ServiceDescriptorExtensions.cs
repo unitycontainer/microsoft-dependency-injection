@@ -24,20 +24,23 @@ namespace Unity.Microsoft.DependencyInjection
             return null;
         }
 
-        internal static LifetimeManager GetLifetime(this ServiceDescriptor serviceDescriptor, IUnityContainer container)
+        internal static string GetRegistrationName(this ServiceDescriptor service)
         {
-            switch (serviceDescriptor.Lifetime)
+            if (service.ImplementationType != null)
             {
-                case ServiceLifetime.Scoped:
-                    return new HierarchicalLifetimeManager();
-                case ServiceLifetime.Singleton:
-                    return new ContainerControlledLifetimeManager();
-                case ServiceLifetime.Transient:
-                    return new HierarchicalTransientLifetimeManager();
-                default:
-                    throw new NotImplementedException(
-                        $"Unsupported lifetime manager type '{serviceDescriptor.Lifetime}'");
+                return service.ImplementationType.FullName;
             }
+            else if (service.ImplementationInstance != null)
+            {
+                return service.ImplementationInstance.GetType().FullName;
+            }
+            else if (service.ImplementationFactory != null)
+            {
+                var typeArguments = service.ImplementationFactory.GetType().GenericTypeArguments;
+                return typeArguments[1].FullName;
+            }
+
+            return null;
         }
     }
 }

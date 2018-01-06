@@ -1,4 +1,5 @@
 ﻿using Unity.Extension;
+using Unity.Lifetime;
 using Unity.Policy;
 
 namespace Unity.Microsoft.DependencyInjection
@@ -9,5 +10,7 @@ namespace Unity.Microsoft.DependencyInjection
         {
             Context.Policies.SetDefault<IConstructorSelectorPolicy>(new ConstructorSelectorPolicy());
         }
+
+        public ILifetimeContainer Lifetime => Context.Lifetime;
     }
 }

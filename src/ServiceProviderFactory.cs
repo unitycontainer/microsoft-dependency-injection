@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Unity.Microsoft.DependencyInjection
@@ -18,7 +16,7 @@ namespace Unity.Microsoft.DependencyInjection
         {
             var unityContainer = new UnityContainer();
 
-            unityContainer.Configure(serviceCollection);
+            unityContainer.AddServices(serviceCollection);
 
             _configurationAction(unityContainer);
 

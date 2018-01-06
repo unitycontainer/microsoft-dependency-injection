@@ -11,7 +11,6 @@ namespace Unity.Microsoft.DependencyInjection
         internal ServiceProvider(IUnityContainer container)
         {
             _container = container;
-            _container.AddNewExtension<MDIExtension>();
             _container.RegisterInstance<IServiceScope>(this);
             _container.RegisterInstance<IServiceProvider>(this);
             _container.RegisterInstance<IServiceScopeFactory>(this);
@@ -37,7 +36,8 @@ namespace Unity.Microsoft.DependencyInjection
 
         public IServiceScope CreateScope()
         {
-            return new ServiceProvider(_container.CreateChildContainer());
+            return new ServiceProvider(_container.CreateChildContainer()
+                                                 .AddNewExtension<MDIExtension>());
         }
 
         #endregion
@@ -54,9 +54,8 @@ namespace Unity.Microsoft.DependencyInjection
 
         public static IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var unity = new UnityContainer();
-            unity.Configure(services);    
-            return new ServiceProvider(unity);
+            return new ServiceProvider(new UnityContainer().AddNewExtension<MDIExtension>()
+                                                           .AddServices(services));
         }
 
         #endregion
@@ -90,9 +89,9 @@ namespace Unity.Microsoft.DependencyInjection
     {
         public static IServiceProvider ConfigureServices(this IUnityContainer container, IServiceCollection services)
         {
-            var unity = container.CreateChildContainer();
-            unity.Configure(services);
-            return new ServiceProvider(unity);
+            return new ServiceProvider(container.CreateChildContainer()
+                                                .AddNewExtension<MDIExtension>()
+                                                .AddServices(services));
         }
     }
 }

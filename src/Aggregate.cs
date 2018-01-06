@@ -29,41 +29,41 @@ namespace Unity.Microsoft.DependencyInjection
 
         public void Register()
         {
-            foreach (var serv in Services)
-            {
-                var qualifier = serv.GetImplementationType().FullName;
-                Container.Register(serv, qualifier);
-            }
+            //foreach (var serv in Services)
+            //{
+            //    var qualifier = serv.GetImplementationType().FullName;
+            //    Container.Register(serv, qualifier);
+            //}
 
-            Container.RegisterType(Type, Last.GetLifetime(Container),
-                new InjectionFactory((c, t, s) =>
-                {
-                    if (Last.ServiceType.GetTypeInfo().IsGenericTypeDefinition)
-                        return c.Resolve(t, Last.GetImplementationType().FullName);
-                    var instance = Resolve(c);
-                    return instance;
-                }));
+            //Container.RegisterType(Type, Last.GetLifetime(),
+            //    new InjectionFactory((c, t, s) =>
+            //    {
+            //        if (Last.ServiceType.GetTypeInfo().IsGenericTypeDefinition)
+            //            return c.Resolve(t, Last.GetImplementationType().FullName);
+            //        var instance = Resolve(c);
+            //        return instance;
+            //    }));
 
-            var enumType = typeof(IEnumerable<>).MakeGenericType(Type);
-            Container.RegisterType(enumType, new HierarchicalTransientLifetimeManager(),
-                new InjectionFactory(c =>
-                {
-                    List<object> instances = new List<object>();
-                    foreach (var serv in Services)
-                    {
-                        if (!serv.ServiceType.GetTypeInfo().IsGenericTypeDefinition)
-                        {
-                            var qualifier = serv.GetImplementationType().FullName;
-                            var instance = Container.Resolve(serv.ServiceType, qualifier);
-                            instances.Add(instance);
-                        }
-                    }
-                    return typeof(Enumerable)
-                        .GetTypeInfo()
-                        .GetDeclaredMethod("Cast")
-                        .MakeGenericMethod(Type)
-                        .Invoke(null, new[] { instances });
-                }));
+            //var enumType = typeof(IEnumerable<>).MakeGenericType(Type);
+            //Container.RegisterType(enumType, new HierarchicalTransientLifetimeManager(),
+            //    new InjectionFactory(c =>
+            //    {
+            //        List<object> instances = new List<object>();
+            //        foreach (var serv in Services)
+            //        {
+            //            if (!serv.ServiceType.GetTypeInfo().IsGenericTypeDefinition)
+            //            {
+            //                var qualifier = serv.GetImplementationType().FullName;
+            //                var instance = Container.Resolve(serv.ServiceType, qualifier);
+            //                instances.Add(instance);
+            //            }
+            //        }
+            //        return typeof(Enumerable)
+            //            .GetTypeInfo()
+            //            .GetDeclaredMethod("Cast")
+            //            .MakeGenericMethod(Type)
+            //            .Invoke(null, new[] { instances });
+            //    }));
         }
 
         public object Resolve(IUnityContainer container)
