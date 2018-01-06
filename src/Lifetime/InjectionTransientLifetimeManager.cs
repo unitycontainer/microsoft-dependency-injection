@@ -1,7 +1,7 @@
 ﻿using System;
 using Unity.Lifetime;
 
-namespace Unity.Microsoft.DependencyInjection
+namespace Unity.Microsoft.DependencyInjection.Lifetime
 {
     /// <summary>
     /// A special lifetime manager which works like <see cref="TransienLifetimeManager"/>,

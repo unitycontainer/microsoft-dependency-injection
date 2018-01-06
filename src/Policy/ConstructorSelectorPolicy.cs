@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Unity.Policy;
-using Unity.ObjectBuilder.BuildPlan.Selection;
+using Unity.Attributes;
 using Unity.Builder;
 using Unity.Builder.Selection;
-using Unity.Attributes;
+using Unity.ObjectBuilder.BuildPlan.Selection;
+using Unity.Policy;
 using Unity.ResolverPolicy;
 
-namespace Unity.Microsoft.DependencyInjection
+namespace Unity.Microsoft.DependencyInjection.Policy
 {
     public class ConstructorSelectorPolicy : IConstructorSelectorPolicy
     {
-        DefaultUnityConstructorSelectorPolicy dependency = new DefaultUnityConstructorSelectorPolicy();
+        private readonly DefaultUnityConstructorSelectorPolicy _dependency = new DefaultUnityConstructorSelectorPolicy();
         
         /// <summary>
         /// Choose the constructor to call for the given type.
@@ -28,7 +28,7 @@ namespace Unity.Microsoft.DependencyInjection
             ConstructorInfo ctor = FindDependencyConstructor<DependencyAttribute>(context);
             if (ctor != null)
                 return CreateSelectedConstructor(ctor);
-            return dependency.SelectConstructor(context, resolverPolicyDestination);
+            return _dependency.SelectConstructor(context, resolverPolicyDestination);
         }
 
         private ConstructorInfo FindDependencyConstructor<T>(IBuilderContext context)
@@ -57,6 +57,7 @@ namespace Unity.Microsoft.DependencyInjection
         {
             if (constructors.Count() == 1)
                 return constructors.First();
+
             return null;
         }
 

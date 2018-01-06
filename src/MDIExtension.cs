@@ -1,10 +1,11 @@
 ﻿using Unity.Extension;
 using Unity.Lifetime;
+using Unity.Microsoft.DependencyInjection.Policy;
 using Unity.Policy;
 
 namespace Unity.Microsoft.DependencyInjection
 {
-    internal class MDIExtension : UnityContainerExtension
+    internal class MdiExtension : UnityContainerExtension
     {
         protected override void Initialize()
         {

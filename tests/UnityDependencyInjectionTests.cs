@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,33 +16,38 @@ namespace Unity.Microsoft.DependencyInjection.Tests
             return ServiceProvider.ConfigureServices(serviceCollection);
         }
 
+
         [Fact]
         public void Disposes_InReverseOrderOfCreation()
         {
-            TestServiceCollection serviceCollection = new TestServiceCollection();
-            ServiceCollectionServiceExtensions.AddSingleton<FakeDisposeCallback>(serviceCollection);
-            ServiceCollectionServiceExtensions.AddTransient<IFakeOuterService, FakeDisposableCallbackOuterService>(serviceCollection);
-            ServiceCollectionServiceExtensions.AddSingleton<IFakeMultipleService, FakeDisposableCallbackInnerService>(serviceCollection);
-            ServiceCollectionServiceExtensions.AddScoped<IFakeMultipleService, FakeDisposableCallbackInnerService>(serviceCollection);
-            ServiceCollectionServiceExtensions.AddTransient<IFakeMultipleService, FakeDisposableCallbackInnerService>(serviceCollection);
-            ServiceCollectionServiceExtensions.AddSingleton<IFakeService, FakeDisposableCallbackInnerService>(serviceCollection);
-            IServiceProvider provider1 = this.CreateServiceProvider(serviceCollection);
-            FakeDisposeCallback callback = ServiceProviderServiceExtensions.GetService<FakeDisposeCallback>(provider1);
-            IFakeOuterService service = ServiceProviderServiceExtensions.GetService<IFakeOuterService>(provider1);
-            ((IDisposable)provider1).Dispose();
-            Assert.Equal<object>(service, callback.Disposed[0]);
-            Assert.Equal<IFakeMultipleService>(Enumerable.Reverse<IFakeMultipleService>(service.MultipleServices), 
-                                               Enumerable.OfType<IFakeMultipleService>(Enumerable.Take<object>(Enumerable.Skip<object>((IEnumerable<object>)callback.Disposed, 1), 3)));
-            Assert.Equal<object>(service.SingleService, callback.Disposed[4]);
+
+            // Arrange
+            var serviceCollection = new TestServiceCollection();
+            serviceCollection.AddSingleton<FakeDisposeCallback>();
+            serviceCollection.AddTransient<IFakeOuterService, FakeDisposableCallbackOuterService>();
+            serviceCollection.AddSingleton<IFakeMultipleService, FakeDisposableCallbackInnerService>();
+            serviceCollection.AddScoped<IFakeMultipleService, FakeDisposableCallbackInnerService>();
+            serviceCollection.AddTransient<IFakeMultipleService, FakeDisposableCallbackInnerService>();
+            serviceCollection.AddSingleton<IFakeService, FakeDisposableCallbackInnerService>();
+            var serviceProvider = CreateServiceProvider(serviceCollection);
+
+            var callback = serviceProvider.GetService<FakeDisposeCallback>();
+            var outer = serviceProvider.GetService<IFakeOuterService>();
+            var multipleServices = outer.MultipleServices.ToArray();
+
+            // Act
+            ((IDisposable)serviceProvider).Dispose();
+
+            // Assert
+            Assert.Equal(outer, callback.Disposed[0]);
+            Assert.Equal(multipleServices.Reverse(), callback.Disposed.Skip(1).Take(3).OfType<IFakeMultipleService>());
+            Assert.Equal(outer.SingleService, callback.Disposed[4]);
+
         }
 
-        internal class TestServiceCollection : List<ServiceDescriptor>, 
-                                               IServiceCollection, 
-                                               IList<ServiceDescriptor>, 
-                                               ICollection<ServiceDescriptor>, 
-                                               IEnumerable<ServiceDescriptor>
+
+        internal class TestServiceCollection : List<ServiceDescriptor>, IServiceCollection, IList<ServiceDescriptor>, ICollection<ServiceDescriptor>, IEnumerable<ServiceDescriptor>, IEnumerable
         {
         }
-
     }
 }

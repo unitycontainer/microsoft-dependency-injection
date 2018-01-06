@@ -3,9 +3,12 @@ using System;
 
 namespace Unity.Microsoft.DependencyInjection
 {
-    public class ServiceProvider : IServiceProvider, IServiceScopeFactory, IServiceScope, IDisposable
+    public class ServiceProvider : IServiceProvider, 
+                                   IServiceScopeFactory, 
+                                   IServiceScope, 
+                                   IDisposable
     {
-        protected IUnityContainer _container;
+        private IUnityContainer _container;
 
 
         internal ServiceProvider(IUnityContainer container)
@@ -37,7 +40,7 @@ namespace Unity.Microsoft.DependencyInjection
         public IServiceScope CreateScope()
         {
             return new ServiceProvider(_container.CreateChildContainer()
-                                                 .AddNewExtension<MDIExtension>());
+                                                 .AddNewExtension<MdiExtension>());
         }
 
         #endregion
@@ -54,7 +57,7 @@ namespace Unity.Microsoft.DependencyInjection
 
         public static IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            return new ServiceProvider(new UnityContainer().AddNewExtension<MDIExtension>()
+            return new ServiceProvider(new UnityContainer().AddNewExtension<MdiExtension>()
                                                            .AddServices(services));
         }
 
@@ -90,8 +93,14 @@ namespace Unity.Microsoft.DependencyInjection
         public static IServiceProvider ConfigureServices(this IUnityContainer container, IServiceCollection services)
         {
             return new ServiceProvider(container.CreateChildContainer()
-                                                .AddNewExtension<MDIExtension>()
+                                                .AddNewExtension<MdiExtension>()
                                                 .AddServices(services));
         }
+
+        public static IServiceCollection AddUnity(this IServiceCollection services, Action<IUnityContainer> configurationAction = null)
+        {
+            return services.AddSingleton<IServiceProviderFactory<IUnityContainer>>(new ServiceProviderFactory(configurationAction));
+        }
+
     }
 }

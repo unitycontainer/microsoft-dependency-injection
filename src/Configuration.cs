@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Unity.Injection;
 using Unity.Lifetime;
+using Unity.Microsoft.DependencyInjection.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {
@@ -13,7 +14,7 @@ namespace Unity.Microsoft.DependencyInjection
 
         internal static IUnityContainer AddServices(this IUnityContainer container, IServiceCollection services)
         {
-            var lifetime = container.Configure<MDIExtension>()
+            var lifetime = container.Configure<MdiExtension>()
                                     .Lifetime;
 
             foreach (var group in services.GroupBy(serviceDescriptor => serviceDescriptor.ServiceType,
@@ -24,7 +25,7 @@ namespace Unity.Microsoft.DependencyInjection
                 for (var i = 0; i < group.Length - 1; i++)
                 {
                     var descriptor = group[i];
-                    container.Register(descriptor, descriptor.GetRegistrationName(), lifetime);
+                    container.Register(descriptor, Guid.NewGuid().ToString(), lifetime);
                 }
 
                 // Register default types
@@ -79,7 +80,7 @@ namespace Unity.Microsoft.DependencyInjection
                 case ServiceLifetime.Scoped:
                     return new HierarchicalLifetimeManager();
                 case ServiceLifetime.Singleton:
-                    return new InjectionSingletonLifetimeManager(lifetime);
+                    return new ContainerControlledLifetimeManager();
                 case ServiceLifetime.Transient:
                     return new InjectionTransientLifetimeManager();
                 default:
