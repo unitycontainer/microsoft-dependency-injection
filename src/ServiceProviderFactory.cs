@@ -14,10 +14,8 @@ namespace Unity.Microsoft.DependencyInjection
 
         public IUnityContainer CreateBuilder(IServiceCollection serviceCollection)
         {
-            var unityContainer = new UnityContainer();
-
-            unityContainer.AddServices(serviceCollection);
-
+            var unityContainer = new UnityContainer().AddNewExtension<MdiExtension>()
+                                                     .AddServices(serviceCollection);
             _configurationAction(unityContainer);
 
             return unityContainer;
