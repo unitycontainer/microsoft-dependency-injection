@@ -40,7 +40,7 @@ namespace Unity.Microsoft.DependencyInjection.Tests
 
             // Assert
             Assert.Equal(outer, callback.Disposed[0]);
-            Assert.Equal(multipleServices.Reverse(), callback.Disposed.Skip(1).Take(3).OfType<IFakeMultipleService>());
+            Assert.Equal(outer.MultipleServices.Reverse(), callback.Disposed.Skip(1).Take(3).OfType<IFakeMultipleService>());
             Assert.Equal(outer.SingleService, callback.Disposed[4]);
 
         }

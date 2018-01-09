@@ -80,7 +80,7 @@ namespace Unity.Microsoft.DependencyInjection
                 case ServiceLifetime.Scoped:
                     return new HierarchicalLifetimeManager();
                 case ServiceLifetime.Singleton:
-                    return new ContainerControlledLifetimeManager();
+                    return new InjectionSingletonLifetimeManager(lifetime);
                 case ServiceLifetime.Transient:
                     return new InjectionTransientLifetimeManager();
                 default:
