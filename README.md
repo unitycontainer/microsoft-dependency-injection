@@ -18,11 +18,11 @@ Install-Package Unity.Microsoft.DependencyInjection
 ```C#
 public static IWebHost BuildWebHost(string[] args) =>
     WebHost.CreateDefaultBuilder(args)
-           .UseUnityServiceProvider()
+           .UseUnityServiceProvider()   <----
            .UseStartup<Startup>()
            .Build();
 ```
-- Add method to your `Startup` class
+- Add optional method to your `Startup` class
 ```C#
 public void ConfigureContainer(IUnityContainer container)
 {
