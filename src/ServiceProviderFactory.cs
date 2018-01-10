@@ -5,27 +5,23 @@ namespace Unity.Microsoft.DependencyInjection
 {
     internal class ServiceProviderFactory : IServiceProviderFactory<IUnityContainer>
     {
-        private readonly Action<IUnityContainer> _configurationAction;
+        private readonly IUnityContainer _container;
 
-        public ServiceProviderFactory(Action<IUnityContainer> configurationAction = null)
+        public ServiceProviderFactory(IUnityContainer container)
         {
-            _configurationAction = configurationAction ?? (container => { });
+            _container = container ?? new UnityContainer();
         }
 
-        public IUnityContainer CreateBuilder(IServiceCollection serviceCollection)
+        public IUnityContainer CreateBuilder(IServiceCollection services)
         {
-            var unityContainer = new UnityContainer();
-
-            unityContainer.AddServices(serviceCollection);
-
-            _configurationAction(unityContainer);
-
-            return unityContainer;
+            return _container.CreateChildContainer()
+                             .AddNewExtension<MdiExtension>()
+                             .AddServices(services);
         }
 
-        public IServiceProvider CreateServiceProvider(IUnityContainer unityContainer)
+        public IServiceProvider CreateServiceProvider(IUnityContainer container)
         {
-            return new ServiceProvider(unityContainer);
+            return new ServiceProvider(container);
         }
     }
 }

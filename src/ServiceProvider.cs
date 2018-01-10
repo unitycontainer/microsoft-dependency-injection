@@ -86,21 +86,4 @@ namespace Unity.Microsoft.DependencyInjection
 
         #endregion
     }
-
-
-    public static class ServiceProviderExtension
-    {
-        public static IServiceProvider ConfigureServices(this IUnityContainer container, IServiceCollection services)
-        {
-            return new ServiceProvider(container.CreateChildContainer()
-                                                .AddNewExtension<MdiExtension>()
-                                                .AddServices(services));
-        }
-
-        public static IServiceCollection AddUnity(this IServiceCollection services, Action<IUnityContainer> configurationAction = null)
-        {
-            return services.AddSingleton<IServiceProviderFactory<IUnityContainer>>(new ServiceProviderFactory(configurationAction));
-        }
-
-    }
 }
