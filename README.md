@@ -13,7 +13,7 @@ Install-Package Unity.Microsoft.DependencyInjection
 ```
 
 ## Registration:
-- In the `WebHostBuilder` add `ConfigureServices(services => services.AddUnity())` method
+- In the `WebHostBuilder` add `UseUnityServiceProvider(IUnityContainer container = null)` method
 
 ```C#
 public static IWebHost BuildWebHost(string[] args) =>
