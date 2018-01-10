@@ -4,7 +4,7 @@
 [![NuGet](https://img.shields.io/nuget/v/Unity.Microsoft.DependencyInjection.svg)](https://www.nuget.org/packages/Unity.Microsoft.DependencyInjection)
 
 # Unity.Microsoft.DependencyInjection
-Unity extension to integrate with [Microsoft.Extensions.DependencyInjection.Abstractions](https://github.com/aspnet/DependencyInjection)  compliant systems
+Unity extension to integrate with [Microsoft.Extensions.DependencyInjection](https://github.com/aspnet/DependencyInjection)  compliant systems
 
 ## Get Started
 - Reference the `Unity.Microsoft.DependencyInjection` package from NuGet.
@@ -13,14 +13,14 @@ Install-Package Unity.Microsoft.DependencyInjection
 ```
 
 ## Registration:
-- In the `WebHostBuilder` add `UseUnityServiceProvider(IUnityContainer container = null)` method
+- In the `WebHostBuilder` add `UseUnityServiceProvider(...)` method
 
 ```C#
 public static IWebHost BuildWebHost(string[] args) =>
     WebHost.CreateDefaultBuilder(args)
-        .UseUnityServiceProvider()
-        .UseStartup<Startup>()
-        .Build();
+           .UseUnityServiceProvider()
+           .UseStartup<Startup>()
+           .Build();
 ```
 - Add method to your `Startup` class
 ```C#
