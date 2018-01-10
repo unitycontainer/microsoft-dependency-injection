@@ -12,13 +12,13 @@ Unity extension to integrate with [Microsoft.Extensions.DependencyInjection.Abst
 Install-Package Unity.Microsoft.DependencyInjection
 ```
 
-## First way:
+## Registration:
 - In the `WebHostBuilder` add `ConfigureServices(services => services.AddUnity())` method
 
 ```C#
 public static IWebHost BuildWebHost(string[] args) =>
     WebHost.CreateDefaultBuilder(args)
-        .ConfigureServices(services => services.AddUnity())
+        .UseUnityServiceProvider()
         .UseStartup<Startup>()
         .Build();
 ```
@@ -26,25 +26,10 @@ public static IWebHost BuildWebHost(string[] args) =>
 ```C#
 public void ConfigureContainer(IUnityContainer container)
 {
+  // Could be used to register more types
   container.RegisterType<IMyService, MyService>();
 }
 ```
 
-## Second way:
-- In the `ConfigureServices` method of your `Startup` class...
-  - Register services from the `IServiceCollection`.
-  - Build your container.
-  - Call `ConfigureServices` extension on `IUnityContainer` and return it.
+For example of using Unity with Core 2.0 Web application follow [this link](https://github.com/unitycontainer/examples/tree/master/src/AspNetCoreExample)
 
-```C#
-public IServiceProvider ConfigureServices(IServiceCollection services)
-{
-  services.AddMvc();
-  
-  var container = new UnityContainer();
-  
-  container.RegisterType<IMyService, MyService>();
-  
-  return container.ConfigureServices(services);
-}
-```
