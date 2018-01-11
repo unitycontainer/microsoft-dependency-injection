@@ -18,11 +18,22 @@ Install-Package Unity.Microsoft.DependencyInjection
 ```C#
 public static IWebHost BuildWebHost(string[] args) =>
     WebHost.CreateDefaultBuilder(args)
-           .UseUnityServiceProvider()
+           .UseUnityServiceProvider()   <---- Add this line
            .UseStartup<Startup>()
            .Build();
 ```
-- Add method to your `Startup` class
+
+- In case Unity container configured via application configuration or by convention this container could be used to initalize service provider.
+
+```C#
+public static IWebHost BuildWebHost(string[] args) =>
+    WebHost.CreateDefaultBuilder(args)
+           .UseUnityServiceProvider(_container)   <---- or add this line
+           .UseStartup<Startup>()
+           .Build();
+```
+
+- Add optional method to your `Startup` class
 ```C#
 public void ConfigureContainer(IUnityContainer container)
 {
@@ -30,6 +41,12 @@ public void ConfigureContainer(IUnityContainer container)
   container.RegisterType<IMyService, MyService>();
 }
 ```
+
+### Startup
+
+At the moment it is not possible to resolve Startup class from Unity even if it is configured as default container. [An Issue](https://github.com/aspnet/Hosting/issues/1309) has been filed with ASPNET team to fix it. Once it is resolved it would be possible to resolve Startap class itself from the Unity container.
+
+## Examples
 
 For example of using Unity with Core 2.0 Web application follow [this link](https://github.com/unitycontainer/examples/tree/master/src/AspNetCoreExample)
 
