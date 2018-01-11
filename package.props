@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <Version>2.0.1</Version>
+    <Version>2.0.2</Version>
     <PackageReleaseNotes>This package is distributed as .NET Standard 2.0 package. It is compatible with Microsoft.Extensions.DependencyInjection v2 specification.</PackageReleaseNotes>
   </PropertyGroup>
 
