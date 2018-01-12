@@ -6,7 +6,7 @@
 # Unity.Microsoft.DependencyInjection
 Unity extension to integrate with [Microsoft.Extensions.DependencyInjection](https://github.com/aspnet/DependencyInjection)  compliant systems
 
-## Get Started
+## Getting Started
 - Reference the `Unity.Microsoft.DependencyInjection` package from NuGet.
 ```
 Install-Package Unity.Microsoft.DependencyInjection
