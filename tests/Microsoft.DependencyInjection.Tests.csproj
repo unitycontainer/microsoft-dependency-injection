@@ -16,11 +16,11 @@
     <ProjectReference Include="..\src\Unity.Microsoft.DependencyInjection.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(TargetFramework)' == 'netstandard1.0' ">
+  <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(TargetFramework)' == 'netcoreapp1.1' ">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Specification.Tests" Version="1.1.*" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(TargetFramework)' == 'netstandard2.0' ">
+  <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(TargetFramework)' == 'netcoreapp2.0' ">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Specification.Tests" Version="2.0.*" />
   </ItemGroup>
 

@@ -19,17 +19,17 @@
     <RootNamespace>Unity.Microsoft.DependencyInjection</RootNamespace>
     <UnityAbstractions>..\..\Abstractions\src\Unity.Abstractions.csproj</UnityAbstractions>
     <UnityContainer>..\..\Container\src\Unity.Container.csproj</UnityContainer>
+    <TargetFrameworks>netcoreapp1.1;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
 
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <!--TargetFramework>netstandard2.0</TargetFramework-->
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <TargetFrameworks>netcoreapp1.1;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
 
