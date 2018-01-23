@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Specification;
 using Microsoft.Extensions.DependencyInjection.Specification.Fakes;
@@ -13,7 +10,7 @@ namespace Unity.Microsoft.DependencyInjection.Tests
     {
         protected override IServiceProvider CreateServiceProvider(IServiceCollection serviceCollection)
         {
-            return ServiceProvider.ConfigureServices(serviceCollection);
+            return serviceCollection.BuildServiceProvider();
         }
     }
 }
