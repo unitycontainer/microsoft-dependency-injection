@@ -1,8 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Specification;
-using Microsoft.Extensions.DependencyInjection.Specification.Fakes;
-using Xunit;
 
 namespace Unity.Microsoft.DependencyInjection.Tests
 {
