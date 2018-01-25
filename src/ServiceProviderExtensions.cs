@@ -17,7 +17,7 @@ namespace Unity.Microsoft.DependencyInjection
         /// <returns>The <see cref="ServiceProvider"/>.</returns>
         public static IServiceProvider BuildServiceProvider(this IServiceCollection services, bool validateScopes = false)
         {
-            return new ServiceProvider(new UnityContainer().AddNewExtension<MdiExtension>()
+            return new ServiceProvider(new UnityContainer().AddExtension(new MdiExtension())
                                                            .AddServices(services));
         }
     }
