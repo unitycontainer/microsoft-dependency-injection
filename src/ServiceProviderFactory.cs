@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Unity.Microsoft.DependencyInjection
 {
-    internal class ServiceProviderFactory : IServiceProviderFactory<IUnityContainer>
+    public class ServiceProviderFactory : IServiceProviderFactory<IUnityContainer>
     {
         private readonly IUnityContainer _container;
 
