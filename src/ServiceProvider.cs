@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {
@@ -14,9 +15,9 @@ namespace Unity.Microsoft.DependencyInjection
         internal ServiceProvider(IUnityContainer container)
         {
             _container = container;
-            _container.RegisterInstance<IServiceScope>(this);
-            _container.RegisterInstance<IServiceProvider>(this);
-            _container.RegisterInstance<IServiceScopeFactory>(this);
+            _container.RegisterInstance<IServiceScope>(this, new ExternallyControlledLifetimeManager());
+            _container.RegisterInstance<IServiceProvider>(this, new ExternallyControlledLifetimeManager());
+            _container.RegisterInstance<IServiceScopeFactory>(this, new ExternallyControlledLifetimeManager());
         }
 
         #region IServiceProvider
@@ -39,8 +40,7 @@ namespace Unity.Microsoft.DependencyInjection
 
         public IServiceScope CreateScope()
         {
-            return new ServiceProvider(_container.CreateChildContainer()
-                                                 .AddNewExtension<MdiExtension>());
+            return new ServiceProvider(_container.CreateChildContainer());
         }
 
         #endregion
