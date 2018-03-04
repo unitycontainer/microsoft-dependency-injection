@@ -53,12 +53,17 @@ namespace Unity.Microsoft.DependencyInjection
         #endregion
 
 
-        #region ConfigureServices
+        #region Public Members
 
         public static IServiceProvider ConfigureServices(IServiceCollection services)
         {
             return new ServiceProvider(new UnityContainer().AddExtension(new MdiExtension())
                                                            .AddServices(services));
+        }
+
+        public static explicit operator UnityContainer(ServiceProvider c)
+        {
+            return (UnityContainer)c._container;
         }
 
         #endregion

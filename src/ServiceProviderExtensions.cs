@@ -20,5 +20,31 @@ namespace Unity.Microsoft.DependencyInjection
             return new ServiceProvider(new UnityContainer().AddExtension(new MdiExtension())
                                                            .AddServices(services));
         }
+
+        /// <summary>
+        /// Creates a <see cref="ServiceProvider"/> containing services from the provided <see cref="IServiceCollection"/>
+        /// optionaly enabling scope validation.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> containing service descriptors.</param>
+        /// <param name="container">Parent container</param>
+        /// <returns>Service provider</returns>
+        public static IServiceProvider BuildServiceProvider(this IServiceCollection services, IUnityContainer container)
+        {
+            return new ServiceProvider(container.AddExtension(new MdiExtension())
+                                                .AddServices(services));
+        }
+
+        /// <summary>
+        /// Creates a <see cref="ServiceProvider"/> containing services from the provided <see cref="IServiceCollection"/>
+        /// optionaly enabling scope validation.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> containing service descriptors.</param>
+        /// <param name="container">Parent container</param>
+        /// <returns>Service provider</returns>
+        public static IServiceProvider BuildServiceProvider(this IUnityContainer container, IServiceCollection services)
+        {
+            return new ServiceProvider(container.AddExtension(new MdiExtension())
+                                                .AddServices(services));
+        }
     }
 }
