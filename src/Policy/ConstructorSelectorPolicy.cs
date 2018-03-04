@@ -27,7 +27,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         {
             ConstructorInfo ctor = FindDependencyConstructor<DependencyAttribute>(context);
             if (ctor != null)
-                return CreateSelectedConstructor(ctor);
+                return CreateSelectedConstructor(ctor,context);
             return _dependency.SelectConstructor(context, resolverPolicyDestination);
         }
 
@@ -61,12 +61,12 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             return null;
         }
 
-        private SelectedConstructor CreateSelectedConstructor(ConstructorInfo ctor)
+        private SelectedConstructor CreateSelectedConstructor(ConstructorInfo ctor, IBuilderContext context)
         {
             var result = new SelectedConstructor(ctor);
             foreach (ParameterInfo param in ctor.GetParameters())
             {
-                result.AddParameterResolver(ResolveParameter(param));
+                result.AddParameterResolver(param.HasDefaultValue ? context.Container.CanResolve(param.ParameterType)? ResolveParameter(param): new LiteralValueDependencyResolverPolicy(null) : ResolveParameter(param));
             }
             return result;
         }
@@ -141,7 +141,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
 
         private bool CanBuildUp(ParameterInfo[] parameters, IBuilderContext context)
         {
-            return parameters.All(p => context.Container.CanResolve(p.ParameterType));
+            return parameters.All(p => context.Container.CanResolve(p.ParameterType) || p.HasDefaultValue);
         }
 
         /// <summary>
