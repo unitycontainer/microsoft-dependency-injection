@@ -8,7 +8,7 @@ namespace Unity.Microsoft.DependencyInjection
 
         /// <summary>
         /// Creates a <see cref="ServiceProvider"/> containing services from the provided <see cref="IServiceCollection"/>
-        /// optionaly enabling scope validation.
+        /// optionally enabling scope validation.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> containing service descriptors.</param>
         /// <param name="validateScopes">
@@ -23,7 +23,7 @@ namespace Unity.Microsoft.DependencyInjection
 
         /// <summary>
         /// Creates a <see cref="ServiceProvider"/> containing services from the provided <see cref="IServiceCollection"/>
-        /// optionaly enabling scope validation.
+        /// optionally enabling scope validation.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> containing service descriptors.</param>
         /// <param name="container">Parent container</param>
@@ -36,7 +36,7 @@ namespace Unity.Microsoft.DependencyInjection
 
         /// <summary>
         /// Creates a <see cref="ServiceProvider"/> containing services from the provided <see cref="IServiceCollection"/>
-        /// optionaly enabling scope validation.
+        /// optionally enabling scope validation.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> containing service descriptors.</param>
         /// <param name="container">Parent container</param>
