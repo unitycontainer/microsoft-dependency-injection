@@ -23,7 +23,7 @@ public static IWebHost BuildWebHost(string[] args) =>
            .Build();
 ```
 
-- In case Unity container configured via application configuration or by convention this container could be used to initalize service provider.
+- In case Unity container configured via application configuration or by convention this container could be used to initialize service provider.
 
 ```C#
 public static IWebHost BuildWebHost(string[] args) =>
@@ -44,7 +44,7 @@ public void ConfigureContainer(IUnityContainer container)
 
 ### Startup
 
-At the moment it is not possible to resolve Startup class from Unity even if it is configured as default container. [An Issue](https://github.com/aspnet/Hosting/issues/1309) has been filed with ASPNET team to fix it. Once it is resolved it would be possible to resolve Startap class itself from the Unity container.
+At the moment it is not possible to resolve Startup class from Unity even if it is configured as default container. [An Issue](https://github.com/aspnet/Hosting/issues/1309) has been filed with ASPNET team to fix it. Once it is resolved it would be possible to resolve the Startup class itself from the Unity container.
 
 ## Examples
 
