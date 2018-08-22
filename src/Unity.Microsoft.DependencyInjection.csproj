@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\package.props" />
 
@@ -25,11 +25,13 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <DebugType>Full</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <TargetFrameworks>netcoreapp1.1;netstandard2.0</TargetFrameworks>
+    <DebugType>Portable</DebugType>
   </PropertyGroup>
 
 
@@ -48,8 +50,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.*" /> 
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" /> 
   </ItemGroup>
 
 
