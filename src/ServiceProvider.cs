@@ -77,7 +77,7 @@ namespace Unity.Microsoft.DependencyInjection
             GC.SuppressFinalize(this);
         }
 
-        private void Dispose(bool mode)
+        private void Dispose(bool _)
         {
             IDisposable disposable = _container;
             _container = null;
