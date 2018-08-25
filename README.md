@@ -44,7 +44,7 @@ public void ConfigureContainer(IUnityContainer container)
 
 ### Startup
 
-At the moment it is not possible to resolve Startup class from Unity even if it is configured as default container. [An Issue](https://github.com/aspnet/Hosting/issues/1309) has been filed with ASPNET team to fix it. Once it is resolved it would be possible to resolve the Startup class itself from the Unity container.
+Startup class instance is resolved from Unity if it is configured as default container. [An Issue resolved](https://github.com/aspnet/Hosting/issues/1309).
 
 ## Examples
 
