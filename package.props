@@ -1,13 +1,13 @@
 <Project>
 
   <PropertyGroup>
-    <Version>2.1.0</Version>
+    <Version>2.1.1</Version>
     <PackageReleaseNotes>Bug fixes, dependency updates and minor performance optimizations</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
     <UnityAbstractionsVersion>3.*</UnityAbstractionsVersion>
-    <UnityContainerVersion>5.*</UnityContainerVersion>
+    <UnityContainerVersion>5.8.*</UnityContainerVersion>
   </PropertyGroup>
 
 </Project>
