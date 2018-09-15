@@ -17,8 +17,6 @@
     <Authors>Unity Open Source Project</Authors>
     <Company>Unity Open Source Project</Company>
     <RootNamespace>Unity.Microsoft.DependencyInjection</RootNamespace>
-    <UnityAbstractions>..\..\Abstractions\src\Unity.Abstractions.csproj</UnityAbstractions>
-    <UnityContainer>..\..\Container\src\Unity.Container.csproj</UnityContainer>
   </PropertyGroup>
 
 
@@ -35,12 +33,17 @@
   </PropertyGroup>
 
 
-  <ItemGroup Condition="Exists('$(UnityAbstractions)')">
-    <ProjectReference Include="$(UnityAbstractions)" />
-  </ItemGroup>
+
+  <PropertyGroup>
+    <UnityContainer>..\..\Container\src\Unity.Container.csproj</UnityContainer>
+  </PropertyGroup>
 
   <ItemGroup Condition="Exists('$(UnityContainer)')">
     <ProjectReference Include="$(UnityContainer)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="!Exists('$(UnityContainer)')">
+    <PackageReference Include="Unity.Container" Version="$(UnityContainerVersion)" />
   </ItemGroup>
 
 
@@ -54,13 +57,5 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" /> 
   </ItemGroup>
 
-
-  <ItemGroup Condition="!Exists('$(UnityAbstractions)')">
-    <PackageReference Include="Unity.Abstractions" Version="3.3.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition="!Exists('$(UnityContainer)')">
-    <PackageReference Include="Unity.Container" Version="5.8.9" />      
-  </ItemGroup>
 
 </Project>
