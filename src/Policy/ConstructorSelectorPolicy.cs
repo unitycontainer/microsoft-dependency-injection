@@ -19,9 +19,6 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// Choose the constructor to call for the given type.
         /// </summary>
         /// <param name="context">Current build context</param>
-        /// <param name="resolverPolicyDestination">
-        /// The Microsoft.Practices.ObjectBuilder2.IPolicyList to add any generated resolver objects into.
-        /// </param>
         /// <returns>The chosen constructor.</returns>
         public SelectedConstructor SelectConstructor(IBuilderContext context)
         {
