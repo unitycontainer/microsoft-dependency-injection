@@ -23,12 +23,12 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// The Microsoft.Practices.ObjectBuilder2.IPolicyList to add any generated resolver objects into.
         /// </param>
         /// <returns>The chosen constructor.</returns>
-        public SelectedConstructor SelectConstructor(IBuilderContext context, IPolicyList resolverPolicyDestination)
+        public SelectedConstructor SelectConstructor(IBuilderContext context)
         {
             ConstructorInfo ctor = FindDependencyConstructor<DependencyAttribute>(context);
             if (ctor != null)
                 return CreateSelectedConstructor(ctor,context);
-            return _dependency.SelectConstructor(context, resolverPolicyDestination);
+            return _dependency.SelectConstructor(context);
         }
 
         private ConstructorInfo FindDependencyConstructor<T>(IBuilderContext context)
