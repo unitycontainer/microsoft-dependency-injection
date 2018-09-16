@@ -2,6 +2,7 @@
 using Unity.Microsoft.DependencyInjection.Policy;
 using Unity.Policy;
 using Unity.Policy.Lifetime;
+using Unity.Storage;
 
 namespace Unity.Microsoft.DependencyInjection
 {
