@@ -2,6 +2,7 @@
 using System.Threading;
 using Unity.Exceptions;
 using Unity.Lifetime;
+using Unity.Policy.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection.Lifetime
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using Unity.Lifetime;
+using Unity.Policy.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection.Lifetime
 {
