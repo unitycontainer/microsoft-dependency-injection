@@ -20,7 +20,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// </summary>
         /// <param name="context">Current build context</param>
         /// <returns>The chosen constructor.</returns>
-        public SelectedConstructor SelectConstructor<T>(ref T context) where T : IBuilderContext
+        public SelectedConstructor SelectConstructor<TContext>(ref TContext context) where TContext : IBuilderContext
         {
             ConstructorInfo ctor = FindDependencyConstructor<DependencyAttribute>(context);
             if (ctor != null)
