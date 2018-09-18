@@ -5,9 +5,9 @@ using System.Reflection;
 using Unity.Attributes;
 using Unity.Builder;
 using Unity.Builder.Selection;
-using Unity.ObjectBuilder.BuildPlan.Selection;
 using Unity.Policy;
 using Unity.ResolverPolicy;
+using Unity.Strategies.Legacy.Selection;
 
 namespace Unity.Microsoft.DependencyInjection.Policy
 {
@@ -20,12 +20,12 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// </summary>
         /// <param name="context">Current build context</param>
         /// <returns>The chosen constructor.</returns>
-        public SelectedConstructor SelectConstructor(IBuilderContext context)
+        public SelectedConstructor SelectConstructor<T>(ref T context) where T : IBuilderContext
         {
             ConstructorInfo ctor = FindDependencyConstructor<DependencyAttribute>(context);
             if (ctor != null)
-                return CreateSelectedConstructor(ctor,context);
-            return _dependency.SelectConstructor(context);
+                return CreateSelectedConstructor(ctor, context);
+            return _dependency.SelectConstructor(ref context);
         }
 
         private ConstructorInfo FindDependencyConstructor<T>(IBuilderContext context)
