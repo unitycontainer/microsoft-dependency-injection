@@ -19,19 +19,18 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// Choose the constructor to call for the given type.
         /// </summary>
         /// <param name="context">Current build context</param>
-        /// <param name="resolverPolicyDestination">
-        /// The Microsoft.Practices.ObjectBuilder2.IPolicyList to add any generated resolver objects into.
-        /// </param>
         /// <returns>The chosen constructor.</returns>
-        public SelectedConstructor SelectConstructor(IBuilderContext context)
+        public SelectedConstructor SelectConstructor<TBuilderContext>(ref TBuilderContext context)
+            where TBuilderContext : IBuilderContext
         {
-            ConstructorInfo ctor = FindDependencyConstructor<DependencyAttribute>(context);
+            ConstructorInfo ctor = FindDependencyConstructor<TBuilderContext, DependencyAttribute>(ref context);
             if (ctor != null)
-                return CreateSelectedConstructor(ctor,context);
-            return _dependency.SelectConstructor(context);
+                return CreateSelectedConstructor(ctor, ref context);
+            return _dependency.SelectConstructor(ref context);
         }
 
-        private ConstructorInfo FindDependencyConstructor<T>(IBuilderContext context)
+        private ConstructorInfo FindDependencyConstructor<TBuilderContext, T>(ref TBuilderContext context)
+            where TBuilderContext : IBuilderContext
         {
             Type typeOfAttribute = typeof(T);
 
@@ -44,7 +43,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
                 .ToArray();
             switch (injectionConstructors.Length)
             {
-                case 0: return FindSingleConstructor(constructorInfos) ?? Other(constructorInfos.ToArray(), context);
+                case 0: return FindSingleConstructor(constructorInfos) ?? Other(constructorInfos.ToArray(), ref context);
                 case 1: return injectionConstructors[0];
                 default:
                     throw new InvalidOperationException(
@@ -61,7 +60,8 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             return null;
         }
 
-        private SelectedConstructor CreateSelectedConstructor(ConstructorInfo ctor, IBuilderContext context)
+        private SelectedConstructor CreateSelectedConstructor<TBuilderContext>(ConstructorInfo ctor, ref TBuilderContext context)
+            where TBuilderContext : IBuilderContext
         {
             var result = new SelectedConstructor(ctor);
             foreach (ParameterInfo param in ctor.GetParameters())
@@ -71,7 +71,8 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             return result;
         }
 
-        private ConstructorInfo Other(ConstructorInfo[] constructors, IBuilderContext context)
+        private ConstructorInfo Other<TBuilderContext>(ConstructorInfo[] constructors, ref TBuilderContext context)
+            where TBuilderContext : IBuilderContext
         {
             Array.Sort(constructors, (a, b) =>
             {
@@ -90,7 +91,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             {
                 var parameters = constructors[i].GetParameters();
 
-                var can = CanBuildUp(parameters, context);
+                var can = CanBuildUp(parameters, ref context);
 
                 if (can)
                 {
@@ -139,9 +140,11 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             }
         }
 
-        private bool CanBuildUp(ParameterInfo[] parameters, IBuilderContext context)
+        private bool CanBuildUp<TBuilderContext>(ParameterInfo[] parameters, ref TBuilderContext context)
+            where TBuilderContext : IBuilderContext
         {
-            return parameters.All(p => context.Container.CanResolve(p.ParameterType) || p.HasDefaultValue);
+            var container = context.Container;
+            return parameters.All(p => container.CanResolve(p.ParameterType) || p.HasDefaultValue);
         }
 
         /// <summary>
