@@ -5,7 +5,7 @@ using System.Reflection;
 using Unity.Attributes;
 using Unity.Build;
 using Unity.Builder.Selection;
-using Unity.ObjectBuilder.BuildPlan.Selection;
+using Unity.ObjectBuilder.Policies;
 using Unity.Policy;
 using Unity.ResolverPolicy;
 
@@ -159,12 +159,16 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// <returns>The Resolver Policy.</returns>
         public IResolverPolicy ResolveParameter(ParameterInfo parameter)
         {
+            // TODO: Requires optimization
             var optional = parameter.GetCustomAttribute<OptionalDependencyAttribute>(false) != null;
             // parametros do construtor com attribute Dependency
             var attrs2 = parameter.GetCustomAttributes(false).OfType<DependencyResolutionAttribute>().ToList();
             if (attrs2.Count > 0)
             {
-                return attrs2[0].CreateResolver(parameter.ParameterType);
+                var attr = attrs2[0];
+                return attr is OptionalDependencyAttribute dependencyAttribute
+                    ? (IResolverPolicy)new OptionalDependencyResolverPolicy(parameter.ParameterType, dependencyAttribute.Name)
+                    : new NamedTypeDependencyResolverPolicy(parameter.ParameterType, attr.Name);
             }
 
             // No attribute, just go back to the container for the default for that type.
