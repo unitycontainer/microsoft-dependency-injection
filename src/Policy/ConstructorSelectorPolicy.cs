@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Unity.Attributes;
-using Unity.Builder;
+using Unity.Build;
 using Unity.Builder.Selection;
 using Unity.ObjectBuilder.BuildPlan.Selection;
 using Unity.Policy;
@@ -20,21 +20,21 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// </summary>
         /// <param name="context">Current build context</param>
         /// <returns>The chosen constructor.</returns>
-        public SelectedConstructor SelectConstructor<TBuilderContext>(ref TBuilderContext context)
-            where TBuilderContext : IBuilderContext
+        public object SelectConstructor<TContext>(ref TContext context)
+            where TContext : IBuildContext
         {
-            ConstructorInfo ctor = FindDependencyConstructor<TBuilderContext, DependencyAttribute>(ref context);
+            ConstructorInfo ctor = FindDependencyConstructor<TContext, DependencyAttribute>(ref context);
             if (ctor != null)
                 return CreateSelectedConstructor(ctor, ref context);
             return _dependency.SelectConstructor(ref context);
         }
 
-        private ConstructorInfo FindDependencyConstructor<TBuilderContext, T>(ref TBuilderContext context)
-            where TBuilderContext : IBuilderContext
+        private ConstructorInfo FindDependencyConstructor<TContext, T>(ref TContext context)
+            where TContext : IBuildContext
         {
             Type typeOfAttribute = typeof(T);
 
-            IEnumerable<ConstructorInfo> constructors = context.BuildKey.Type.GetTypeInfo()
+            IEnumerable<ConstructorInfo> constructors = context.Type.GetTypeInfo()
                 .DeclaredConstructors.Where(c => (!c.IsStatic) && c.IsPublic);
 
             var constructorInfos = constructors as ConstructorInfo[] ?? constructors.ToArray();
@@ -48,7 +48,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
                 default:
                     throw new InvalidOperationException(
                $"Existem multiplos construtores decorados com Inject para a classe " +
-               $"{context.BuildKey.Type.GetTypeInfo().Name}");
+               $"{context.Type.GetTypeInfo().Name}");
             }
         }
 
@@ -60,8 +60,8 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             return null;
         }
 
-        private SelectedConstructor CreateSelectedConstructor<TBuilderContext>(ConstructorInfo ctor, ref TBuilderContext context)
-            where TBuilderContext : IBuilderContext
+        private SelectedConstructor CreateSelectedConstructor<TContext>(ConstructorInfo ctor, ref TContext context)
+            where TContext : IBuildContext
         {
             var result = new SelectedConstructor(ctor);
             foreach (ParameterInfo param in ctor.GetParameters())
@@ -71,8 +71,8 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             return result;
         }
 
-        private ConstructorInfo Other<TBuilderContext>(ConstructorInfo[] constructors, ref TBuilderContext context)
-            where TBuilderContext : IBuilderContext
+        private ConstructorInfo Other<TContext>(ConstructorInfo[] constructors, ref TContext context)
+            where TContext : IBuildContext
         {
             Array.Sort(constructors, (a, b) =>
             {
@@ -116,7 +116,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
                                 && !parameters.All(p => p.ParameterType.GetTypeInfo().IsInterface))
                                 return bestConstructor;
 
-                            var msg = $"Falha ao procurar um construtor para {context.BuildKey.Type.FullName}\n" +
+                            var msg = $"Falha ao procurar um construtor para {context.Type.FullName}\n" +
                                 $"Há uma abiquidade entre os construtores";
                             throw new InvalidOperationException(msg);
                         }
@@ -132,7 +132,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             {
                 //return null;
                 throw new InvalidOperationException(
-                    $"Construtor não encontrado para {context.BuildKey.Type.FullName}");
+                    $"Construtor não encontrado para {context.Type.FullName}");
             }
             else
             {
@@ -140,8 +140,8 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             }
         }
 
-        private bool CanBuildUp<TBuilderContext>(ParameterInfo[] parameters, ref TBuilderContext context)
-            where TBuilderContext : IBuilderContext
+        private bool CanBuildUp<TContext>(ParameterInfo[] parameters, ref TContext context)
+            where TContext : IBuildContext
         {
             var container = context.Container;
             return parameters.All(p => container.CanResolve(p.ParameterType) || p.HasDefaultValue);
