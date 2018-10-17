@@ -3,8 +3,8 @@
   <Import Project="..\package.props" />
 
   <PropertyGroup>
-    <FileVersion>$(Version).0</FileVersion>
-    <AssemblyVersion>$(Version).0</AssemblyVersion>
+    <FileVersion>2.1.2.1</FileVersion>
+    <AssemblyVersion>2.1.2.1</AssemblyVersion>
     <PackageId>Unity.Microsoft.DependencyInjection</PackageId>
     <Description>Unity for Microsoft Dependency Injection framework.</Description>
     <Copyright>Copyright © Unity Container Project 2018</Copyright>
@@ -19,11 +19,13 @@
     <RootNamespace>Unity.Microsoft.DependencyInjection</RootNamespace>
     <UnityAbstractions>..\..\Abstractions\src\Unity.Abstractions.csproj</UnityAbstractions>
     <UnityContainer>..\..\Container\src\Unity.Container.csproj</UnityContainer>
+    <Version>2.1.2.1</Version>
+    <PackageReleaseNotes>Extended to allow for resolution customization. Updated error language to english.</PackageReleaseNotes>
   </PropertyGroup>
 
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <TargetFramework>netstandard2.0</TargetFramework>
     <DebugType>Full</DebugType>
   </PropertyGroup>

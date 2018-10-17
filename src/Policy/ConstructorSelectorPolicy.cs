@@ -48,8 +48,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
                 case 1: return injectionConstructors[0];
                 default:
                     throw new InvalidOperationException(
-               $"Existem multiplos construtores decorados com Inject para a classe " +
-               $"{context.BuildKey.Type.GetTypeInfo().Name}");
+               $"There are multiple constructors decorated with Inject attribute for the class {context.BuildKey.Type.GetTypeInfo().Name}");
             }
         }
 
@@ -115,8 +114,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
                                 && !parameters.All(p => p.ParameterType.GetTypeInfo().IsInterface))
                                 return bestConstructor;
 
-                            var msg = $"Falha ao procurar um construtor para {context.BuildKey.Type.FullName}\n" +
-                                $"Há uma abiquidade entre os construtores";
+                            var msg = $"Failed to search for a constructor for {context.BuildKey.Type.FullName}{Environment.NewLine}There is an abnormality between the constructors";
                             throw new InvalidOperationException(msg);
                         }
                         else
@@ -131,7 +129,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             {
                 //return null;
                 throw new InvalidOperationException(
-                    $"Construtor não encontrado para {context.BuildKey.Type.FullName}");
+                    $"Constructor not found for {context.BuildKey.Type.FullName}");
             }
             else
             {

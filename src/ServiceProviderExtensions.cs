@@ -17,8 +17,10 @@ namespace Unity.Microsoft.DependencyInjection
         /// <returns>The <see cref="ServiceProvider"/>.</returns>
         public static IServiceProvider BuildServiceProvider(this IServiceCollection services, bool validateScopes = false)
         {
-            return new ServiceProvider(new UnityContainer().AddExtension(new MdiExtension())
-                                                           .AddServices(services));
+            var container = new UnityContainer().AddExtension(new MdiExtension())
+                                               .AddServices(services);
+
+            return new ServiceProvider(new UnityConfigurationOptions { UnityContainer = container });
         }
 
         /// <summary>
@@ -30,8 +32,10 @@ namespace Unity.Microsoft.DependencyInjection
         /// <returns>Service provider</returns>
         public static IServiceProvider BuildServiceProvider(this IServiceCollection services, IUnityContainer container)
         {
-            return new ServiceProvider(container.AddExtension(new MdiExtension())
-                                                .AddServices(services));
+            container.AddExtension(new MdiExtension())
+                     .AddServices(services);
+
+            return new ServiceProvider(new UnityConfigurationOptions { UnityContainer = container });
         }
 
         /// <summary>
@@ -43,8 +47,10 @@ namespace Unity.Microsoft.DependencyInjection
         /// <returns>Service provider</returns>
         public static IServiceProvider BuildServiceProvider(this IUnityContainer container, IServiceCollection services)
         {
-            return new ServiceProvider(container.AddExtension(new MdiExtension())
-                                                .AddServices(services));
+            container.AddExtension(new MdiExtension())
+                     .AddServices(services);
+
+            return new ServiceProvider(new UnityConfigurationOptions { UnityContainer = container });
         }
     }
 }
