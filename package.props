@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <Version>2.1.1</Version>
+    <Version>2.1.2</Version>
     <PackageReleaseNotes>Bug fixes, dependency updates and minor performance optimizations</PackageReleaseNotes>
   </PropertyGroup>
 
