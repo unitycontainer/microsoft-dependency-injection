@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {

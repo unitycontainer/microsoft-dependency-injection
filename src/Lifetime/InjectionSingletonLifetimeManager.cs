@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using Unity.Exceptions;
-using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection.Lifetime
 {
