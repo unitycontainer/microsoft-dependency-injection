@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Unity.Build;
+using Unity.Builder;
 using Unity.Builder.Selection;
 using Unity.ObjectBuilder.Policies;
 using Unity.Policy;
@@ -20,7 +20,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// <param name="context">Current build context</param>
         /// <returns>The chosen constructor.</returns>
         public object SelectConstructor<TContext>(ref TContext context)
-            where TContext : IBuildContext
+            where TContext : IBuilderContext
         {
             ConstructorInfo ctor = FindDependencyConstructor<TContext, DependencyAttribute>(ref context);
             if (ctor != null)
@@ -29,7 +29,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         }
 
         private ConstructorInfo FindDependencyConstructor<TContext, T>(ref TContext context)
-            where TContext : IBuildContext
+            where TContext : IBuilderContext
         {
             Type typeOfAttribute = typeof(T);
 
@@ -60,7 +60,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         }
 
         private SelectedConstructor CreateSelectedConstructor<TContext>(ConstructorInfo ctor, ref TContext context)
-            where TContext : IBuildContext
+            where TContext : IBuilderContext
         {
             var result = new SelectedConstructor(ctor);
             foreach (ParameterInfo param in ctor.GetParameters())
@@ -71,7 +71,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         }
 
         private ConstructorInfo Other<TContext>(ConstructorInfo[] constructors, ref TContext context)
-            where TContext : IBuildContext
+            where TContext : IBuilderContext
         {
             Array.Sort(constructors, (a, b) =>
             {
@@ -140,7 +140,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         }
 
         private bool CanBuildUp<TContext>(ParameterInfo[] parameters, ref TContext context)
-            where TContext : IBuildContext
+            where TContext : IBuilderContext
         {
             var container = context.Container;
             return parameters.All(p => container.CanResolve(p.ParameterType) || p.HasDefaultValue);
