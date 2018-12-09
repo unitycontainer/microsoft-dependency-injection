@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Unity.Microsoft.DependencyInjection.Tests
 {
-    public class GitHubIssues
+    public class IssuesOnGitHub
     {
         public interface IScopedService
         {
@@ -85,7 +85,7 @@ namespace Unity.Microsoft.DependencyInjection.Tests
 
 
         [Fact]
-        public void Test2_failing()
+        public void Issue_28()
         {
 
             var serviceCollection = new ServiceCollection();
@@ -95,10 +95,11 @@ namespace Unity.Microsoft.DependencyInjection.Tests
 
             IUnityContainer container = new UnityContainer().CreateChildContainer();
 
-            var factory = new ServiceProviderFactory(c => c.UnityContainer = container);
+            var factory = new ServiceProviderFactory(container);
 
             var sp = factory.CreateServiceProvider(serviceCollection);
             var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
+            var httpFactory0 = sp.GetRequiredService<IHttpClientFactory>();
             using (var scope = scopeFactory.CreateScope())
             {
                 var httpFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();

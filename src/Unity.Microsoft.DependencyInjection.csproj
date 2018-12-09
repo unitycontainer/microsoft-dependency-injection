@@ -3,8 +3,8 @@
   <Import Project="..\package.props" />
 
   <PropertyGroup>
-    <FileVersion>2.1.2.1</FileVersion>
-    <AssemblyVersion>2.1.2.1</AssemblyVersion>
+    <FileVersion>$(Version).0</FileVersion>
+    <AssemblyVersion>$(Version).0</AssemblyVersion>
     <PackageId>Unity.Microsoft.DependencyInjection</PackageId>
     <Description>Unity for Microsoft Dependency Injection framework.</Description>
     <Copyright>Copyright © Unity Container Project 2018</Copyright>
@@ -19,13 +19,11 @@
     <RootNamespace>Unity.Microsoft.DependencyInjection</RootNamespace>
     <UnityAbstractions>..\..\Abstractions\src\Unity.Abstractions.csproj</UnityAbstractions>
     <UnityContainer>..\..\Container\src\Unity.Container.csproj</UnityContainer>
-    <Version>2.1.2.1</Version>
-    <PackageReleaseNotes>Extended to allow for resolution customization. Updated error language to english.</PackageReleaseNotes>
   </PropertyGroup>
 
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <TargetFramework>netstandard2.0</TargetFramework>
     <DebugType>Full</DebugType>
   </PropertyGroup>
@@ -52,17 +50,17 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" /> 
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" /> 
   </ItemGroup>
 
 
   <ItemGroup Condition="!Exists('$(UnityAbstractions)')">
-    <PackageReference Include="Unity.Abstractions" Version="3.3.1" />
+    <PackageReference Include="Unity.Abstractions" Version="$(UnityAbstractionsVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('$(UnityContainer)')">
-    <PackageReference Include="Unity.Container" Version="5.8.9" />      
+    <PackageReference Include="Unity.Container" Version="$(UnityContainerVersion)" />      
   </ItemGroup>
 
 </Project>

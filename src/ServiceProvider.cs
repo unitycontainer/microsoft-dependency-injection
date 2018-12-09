@@ -4,37 +4,31 @@ using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {
-    public class ServiceProvider : IServiceProvider,
-                                   IServiceScopeFactory,
-                                   IServiceScope,
+    public class ServiceProvider : IServiceProvider, 
+                                   IServiceScopeFactory, 
+                                   IServiceScope, 
                                    IDisposable
     {
-        private readonly UnityConfigurationOptions _options;
+        private IUnityContainer _container;
 
-        internal ServiceProvider(UnityConfigurationOptions options)
+
+        internal ServiceProvider(IUnityContainer container)
         {
-            _options = options;
-            _options.UnityContainer.RegisterInstance<IServiceScope>(this, new ExternallyControlledLifetimeManager());
-            _options.UnityContainer.RegisterInstance<IServiceProvider>(this, new ExternallyControlledLifetimeManager());
-            _options.UnityContainer.RegisterInstance<IServiceScopeFactory>(this, new ExternallyControlledLifetimeManager());
+            _container = container;
+            _container.RegisterInstance<IServiceScope>(this, new ExternallyControlledLifetimeManager());
+            _container.RegisterInstance<IServiceProvider>(this, new ExternallyControlledLifetimeManager());
+            _container.RegisterInstance<IServiceScopeFactory>(this, new ExternallyControlledLifetimeManager());
         }
 
         #region IServiceProvider
 
         public object GetService(Type serviceType)
         {
-            ResolutionParameters parameters = new ResolutionParameters { Type = serviceType };
-
-            _options.ResolveConfiguration?.Invoke(parameters);
-
             try
             {
-                return _options.UnityContainer.Resolve(parameters.Type, parameters.Name, parameters.ResolverOverrides ?? Array.Empty<Resolution.ResolverOverride>());
+                return _container.Resolve(serviceType);
             }
-            catch
-            {
-                parameters.ResolutionFailureHanlder?.Invoke(serviceType);
-            }
+            catch  { /* Ignore */}
 
             return null;
         }
@@ -46,10 +40,7 @@ namespace Unity.Microsoft.DependencyInjection
 
         public IServiceScope CreateScope()
         {
-            var childOptions = _options.With(_options.UnityContainer.CreateChildContainer());
-            childOptions.CreateScope?.Invoke(childOptions);
-
-            return new ServiceProvider(childOptions);
+            return new ServiceProvider(_container.CreateChildContainer());
         }
 
         #endregion
@@ -66,15 +57,13 @@ namespace Unity.Microsoft.DependencyInjection
 
         public static IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var container = new UnityContainer().AddExtension(new MdiExtension())
-                                                           .AddServices(services);
-
-            return new ServiceProvider(new UnityConfigurationOptions { UnityContainer = container });
+            return new ServiceProvider(new UnityContainer().AddExtension(new MdiExtension())
+                                                           .AddServices(services));
         }
 
         public static explicit operator UnityContainer(ServiceProvider c)
         {
-            return (UnityContainer)c._options.UnityContainer;
+            return (UnityContainer)c._container;
         }
 
         #endregion
@@ -88,14 +77,11 @@ namespace Unity.Microsoft.DependencyInjection
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool _)
+        private void Dispose(bool _)
         {
-            _options.UnityContainer?.Dispose();
-        }
-
-        ~ServiceProvider()
-        {
-            Dispose(false);
+            IDisposable disposable = _container;
+            _container = null;
+            disposable?.Dispose();
         }
 
         #endregion

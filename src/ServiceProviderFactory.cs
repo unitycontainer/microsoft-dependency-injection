@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
@@ -7,16 +7,19 @@ namespace Unity.Microsoft.DependencyInjection
     public class ServiceProviderFactory : IServiceProviderFactory<IUnityContainer>,
                                           IServiceProviderFactory<IServiceCollection>
     {
-        private readonly Action<UnityConfigurationOptions> _config;
+        private readonly IUnityContainer _container;
 
-        public ServiceProviderFactory(Action<UnityConfigurationOptions> config)
+        public ServiceProviderFactory(IUnityContainer container)
         {
-            _config = config;
+            _container = container ?? new UnityContainer();
+
+            _container.RegisterInstance<IServiceProviderFactory<IUnityContainer>>(this, new ContainerControlledLifetimeManager());
+            _container.RegisterInstance<IServiceProviderFactory<IServiceCollection>>(this, new ExternallyControlledLifetimeManager());
         }
 
         public IServiceProvider CreateServiceProvider(IUnityContainer container)
         {
-            return new ServiceProvider(CreateOptions().With(container));
+            return new ServiceProvider(container);
         }
 
         public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
@@ -26,7 +29,7 @@ namespace Unity.Microsoft.DependencyInjection
 
         IUnityContainer IServiceProviderFactory<IUnityContainer>.CreateBuilder(IServiceCollection services)
         {
-            return CreateServiceProviderContainer(services).UnityContainer;
+            return CreateServiceProviderContainer(services);
         }
 
         IServiceCollection IServiceProviderFactory<IServiceCollection>.CreateBuilder(IServiceCollection services)
@@ -34,28 +37,14 @@ namespace Unity.Microsoft.DependencyInjection
             return services;
         }
 
-        private UnityConfigurationOptions CreateServiceProviderContainer(IServiceCollection services)
-        {
-            var options = CreateOptions();
-            options.UnityContainer.AddServices(services);
-            return options;
-        }
 
-        private UnityConfigurationOptions CreateOptions()
+        private IUnityContainer CreateServiceProviderContainer(IServiceCollection services)
         {
-            var options = new UnityConfigurationOptions();
-            _config(options);
-            options.UnityContainer = options.UnityContainer ?? new UnityContainer();
-            ConfigureContainer(options.UnityContainer);
+            var container = _container.CreateChildContainer();
+            new ServiceProviderFactory(container);
 
-            return options;
-        }
-        
-        private void ConfigureContainer(IUnityContainer container)
-        {
-            container.AddExtension(new MdiExtension());
-            container.RegisterInstance<IServiceProviderFactory<IUnityContainer>>(this, new ContainerControlledLifetimeManager());
-            container.RegisterInstance<IServiceProviderFactory<IServiceCollection>>(this, new ExternallyControlledLifetimeManager());
+            return container.AddExtension(new MdiExtension())
+                            .AddServices(services);
         }
     }
 }
