@@ -42,6 +42,38 @@ public void ConfigureContainer(IUnityContainer container)
 }
 ```
 
+- In Startup.cs
+1. Update signature of 
+
+    ```C# 
+    public void ConfigureServices(IServiceCollection services)
+    ```
+
+    to return `IServiceProvider`
+
+    ```C#
+    public IServiceProvider ConfigureServices(IServiceCollection services)
+    ```
+    
+2. Add following code snippet in `ConfigureServices` method
+
+   ```C#
+   public IServiceProvider ConfigureServices(IServiceCollection services)
+   {
+
+        // *** services.AddMvc() etc. code ***
+
+        Unity.Microsoft.DependencyInjection.ServiceProvider serviceProvider = 
+            Unity.Microsoft.DependencyInjection.ServiceProvider.ConfigureServices(services)
+            as Unity.Microsoft.DependencyInjection.ServiceProvider;
+
+        ConfigureContainer((UnityContainer)serviceProvider);
+
+        return serviceProvider;
+    }
+   ```
+
+
 ### Startup
 
 Startup class instance is resolved from Unity if it is configured as default container. [An Issue resolved](https://github.com/aspnet/Hosting/issues/1309).
