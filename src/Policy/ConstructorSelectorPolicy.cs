@@ -6,6 +6,7 @@ using Unity.Builder;
 using Unity.Builder.Selection;
 using Unity.ObjectBuilder.Policies;
 using Unity.Policy;
+using Unity.Resolution;
 using Unity.ResolverPolicy;
 
 namespace Unity.Microsoft.DependencyInjection.Policy
@@ -156,7 +157,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// </summary>
         /// <param name="parameter">Parameter to be injeted.</param>
         /// <returns>The Resolver Policy.</returns>
-        public IResolverPolicy ResolveParameter(ParameterInfo parameter)
+        public IResolver ResolveParameter(ParameterInfo parameter)
         {
             // TODO: Requires optimization
             var optional = parameter.GetCustomAttribute<OptionalDependencyAttribute>(false) != null;
@@ -166,7 +167,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             {
                 var attr = attrs2[0];
                 return attr is OptionalDependencyAttribute dependencyAttribute
-                    ? (IResolverPolicy)new OptionalDependencyResolverPolicy(parameter.ParameterType, dependencyAttribute.Name)
+                    ? (IResolver)new OptionalDependencyResolverPolicy(parameter.ParameterType, dependencyAttribute.Name)
                     : new NamedTypeDependencyResolverPolicy(parameter.ParameterType, attr.Name);
             }
 
