@@ -52,10 +52,7 @@ namespace Unity.Microsoft.DependencyInjection
                                        serviceDescriptor.GetLifetime(lifetime),
                                         new InjectionFactory(scope =>
                                         {
-                                            var serviceProvider = serviceDescriptor.Lifetime == ServiceLifetime.Scoped
-                                                ? scope.Resolve<IServiceProvider>()
-                                                : container.Resolve<IServiceProvider>();
-                                            var instance = serviceDescriptor.ImplementationFactory(serviceProvider);
+                                            var instance = serviceDescriptor.ImplementationFactory(scope.Resolve<IServiceProvider>());
                                             return instance;
                                         }));
             }
