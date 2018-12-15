@@ -66,7 +66,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             var result = new SelectedConstructor(ctor);
             foreach (ParameterInfo param in ctor.GetParameters())
             {
-                result.AddParameterResolver(param.HasDefaultValue ? context.Container.CanResolve(param.ParameterType)? ResolveParameter(param): new LiteralValueDependencyResolverPolicy(null) : ResolveParameter(param));
+                result.AddParameterResolver(param.HasDefaultValue ? context.Container.CanResolve(param.ParameterType)? ResolveParameter(param): new LiteralValueDependencyResolvePolicy(null) : ResolveParameter(param));
             }
             return result;
         }
@@ -157,7 +157,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// </summary>
         /// <param name="parameter">Parameter to be injeted.</param>
         /// <returns>The Resolver Policy.</returns>
-        public IResolver ResolveParameter(ParameterInfo parameter)
+        public IResolve ResolveParameter(ParameterInfo parameter)
         {
             // TODO: Requires optimization
             var optional = parameter.GetCustomAttribute<OptionalDependencyAttribute>(false) != null;
@@ -167,15 +167,15 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             {
                 var attr = attrs2[0];
                 return attr is OptionalDependencyAttribute dependencyAttribute
-                    ? (IResolver)new OptionalDependencyResolverPolicy(parameter.ParameterType, dependencyAttribute.Name)
-                    : new NamedTypeDependencyResolverPolicy(parameter.ParameterType, attr.Name);
+                    ? (IResolve)new OptionalDependencyResolvePolicy(parameter.ParameterType, dependencyAttribute.Name)
+                    : new NamedTypeDependencyResolvePolicy(parameter.ParameterType, attr.Name);
             }
 
             // No attribute, just go back to the container for the default for that type.
             if (optional)
-                return new OptionalDependencyResolverPolicy(parameter.ParameterType, null);
+                return new OptionalDependencyResolvePolicy(parameter.ParameterType, null);
             else
-                return new NamedTypeDependencyResolverPolicy(parameter.ParameterType, null);
+                return new NamedTypeDependencyResolvePolicy(parameter.ParameterType, null);
         }
     }
 }

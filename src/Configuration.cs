@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Unity.Injection;
 using Unity.Microsoft.DependencyInjection.Lifetime;
+using Unity.Policy;
 
 namespace Unity.Microsoft.DependencyInjection
 {
