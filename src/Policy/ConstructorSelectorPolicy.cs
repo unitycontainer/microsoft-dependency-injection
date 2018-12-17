@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Unity.Builder;
-using Unity.Builder.Selection;
-using Unity.ObjectBuilder.Policies;
 using Unity.Policy;
-using Unity.Resolution;
 using Unity.ResolverPolicy;
 
 namespace Unity.Microsoft.DependencyInjection.Policy
 {
     public class ConstructorSelectorPolicy : IConstructorSelectorPolicy
     {
-        private readonly DefaultUnityConstructorSelectorPolicy _dependency = new DefaultUnityConstructorSelectorPolicy();
+        private readonly InvokedConstructorSelector _dependency = new InvokedConstructorSelector();
         
         /// <summary>
         /// Choose the constructor to call for the given type.
