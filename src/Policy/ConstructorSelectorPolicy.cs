@@ -17,17 +17,15 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// </summary>
         /// <param name="context">Current build context</param>
         /// <returns>The chosen constructor.</returns>
-        public object SelectConstructor<TContext>(ref TContext context)
-            where TContext : IBuilderContext
+        public object SelectConstructor(ref BuilderContext context)
         {
-            ConstructorInfo ctor = FindDependencyConstructor<TContext, DependencyAttribute>(ref context);
+            ConstructorInfo ctor = FindDependencyConstructor<DependencyAttribute>(ref context);
             if (ctor != null)
                 return CreateSelectedConstructor(ctor, ref context);
             return _dependency.SelectConstructor(ref context);
         }
 
-        private ConstructorInfo FindDependencyConstructor<TContext, T>(ref TContext context)
-            where TContext : IBuilderContext
+        private ConstructorInfo FindDependencyConstructor<T>(ref BuilderContext context)
         {
             Type typeOfAttribute = typeof(T);
 
@@ -57,8 +55,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             return null;
         }
 
-        private SelectedConstructor CreateSelectedConstructor<TContext>(ConstructorInfo ctor, ref TContext context)
-            where TContext : IBuilderContext
+        private SelectedConstructor CreateSelectedConstructor(ConstructorInfo ctor, ref BuilderContext context)
         {
             var result = new SelectedConstructor(ctor);
             foreach (ParameterInfo param in ctor.GetParameters())
@@ -68,8 +65,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             return result;
         }
 
-        private ConstructorInfo Other<TContext>(ConstructorInfo[] constructors, ref TContext context)
-            where TContext : IBuilderContext
+        private ConstructorInfo Other(ConstructorInfo[] constructors, ref BuilderContext context)
         {
             Array.Sort(constructors, (a, b) =>
             {
@@ -137,8 +133,7 @@ namespace Unity.Microsoft.DependencyInjection.Policy
             }
         }
 
-        private bool CanBuildUp<TContext>(ParameterInfo[] parameters, ref TContext context)
-            where TContext : IBuilderContext
+        private bool CanBuildUp(ParameterInfo[] parameters, ref BuilderContext context)
         {
             var container = context.Container;
             return parameters.All(p => container.CanResolve(p.ParameterType) || p.HasDefaultValue);
