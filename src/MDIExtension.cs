@@ -8,7 +8,7 @@ namespace Unity.Microsoft.DependencyInjection
     {
         protected override void Initialize()
         {
-            Context.Policies.SetDefault<IConstructorSelectorPolicy>(new ConstructorSelectorPolicy());
+            Context.Policies.Set<IConstructorSelectorPolicy>(new ConstructorSelectorPolicy());
         }
 
         public ILifetimeContainer Lifetime => Context.Lifetime;
