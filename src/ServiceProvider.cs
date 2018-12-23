@@ -56,8 +56,9 @@ namespace Unity.Microsoft.DependencyInjection
 
         public static IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            return new ServiceProvider(new UnityContainer().AddExtension(new MdiExtension())
-                                                           .AddServices(services));
+            return new ServiceProvider(new UnityContainer()
+                .AddExtension(new MdiExtension())
+                .AddServices(services));
         }
 
         public static explicit operator UnityContainer(ServiceProvider c)

@@ -14,7 +14,7 @@ namespace Unity.Microsoft.DependencyInjection
 
         internal static IUnityContainer AddServices(this IUnityContainer container, IServiceCollection services)
         {
-            var lifetime = container.Configure<MdiExtension>()
+            var lifetime = ((UnityContainer)container).Configure<MdiExtension>()
                                     .Lifetime;
 
             foreach (var group in services.GroupBy(serviceDescriptor => serviceDescriptor.ServiceType,
