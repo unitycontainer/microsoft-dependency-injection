@@ -4,11 +4,10 @@ using System.Linq;
 using System.Reflection;
 using Unity.Builder;
 using Unity.Policy;
-using Unity.ResolverPolicy;
 
 namespace Unity.Microsoft.DependencyInjection.Policy
 {
-    public class ConstructorSelectorPolicy : IConstructorSelectorPolicy
+    public class ConstructorSelectorPolicy : ISelect<ConstructorInfo>
     {
         private readonly DefaultUnityConstructorSelector _dependency = new DefaultUnityConstructorSelector();
         
@@ -17,12 +16,12 @@ namespace Unity.Microsoft.DependencyInjection.Policy
         /// </summary>
         /// <param name="context">Current build context</param>
         /// <returns>The chosen constructor.</returns>
-        public object SelectConstructor(ref BuilderContext context)
+        public IEnumerable<object> Select(ref BuilderContext context)
         {
             ConstructorInfo ctor = FindDependencyConstructor<DependencyAttribute>(ref context);
-            if (ctor != null) return ctor;
+            if (ctor != null) return new []{ ctor } ;
 
-            return _dependency.SelectConstructor(ref context);
+            return _dependency.Select(ref context);
         }
 
         private ConstructorInfo FindDependencyConstructor<T>(ref BuilderContext context)

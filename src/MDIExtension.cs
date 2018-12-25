@@ -1,4 +1,5 @@
-﻿using Unity.Extension;
+﻿using System.Reflection;
+using Unity.Extension;
 using Unity.Microsoft.DependencyInjection.Policy;
 using Unity.Policy;
 
@@ -8,7 +9,7 @@ namespace Unity.Microsoft.DependencyInjection
     {
         protected override void Initialize()
         {
-            Context.Policies.Set<IConstructorSelectorPolicy>(new ConstructorSelectorPolicy());
+            Context.Policies.Set<ISelect<ConstructorInfo>>(new ConstructorSelectorPolicy());
         }
 
         public ILifetimeContainer Lifetime => Context.Lifetime;
