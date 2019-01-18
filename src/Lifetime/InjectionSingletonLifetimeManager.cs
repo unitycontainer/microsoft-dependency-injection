@@ -3,8 +3,9 @@ using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection.Lifetime
 {
-    public class InjectionSingletonLifetimeManager : SynchronizedLifetimeManager
-
+    public class InjectionSingletonLifetimeManager : SynchronizedLifetimeManager, 
+                                                     IInstanceLifetimeManager, 
+                                                     IFactoryLifetimeManager
     {
         #region Fields
 

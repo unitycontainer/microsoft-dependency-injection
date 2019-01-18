@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
-using Unity.Injection;
 using Unity.Lifetime;
 using Unity.Microsoft.DependencyInjection.Lifetime;
-using Unity.Policy;
 
 namespace Unity.Microsoft.DependencyInjection
 {
@@ -48,24 +46,24 @@ namespace Unity.Microsoft.DependencyInjection
             }
             else if (serviceDescriptor.ImplementationFactory != null)
             {
-                container.RegisterType(serviceDescriptor.ServiceType, 
-                                       qualifier, 
-                                       serviceDescriptor.GetLifetime(lifetime),
-                                        new InjectionFactory(scope =>
+                container.RegisterFactory(serviceDescriptor.ServiceType, 
+                                       qualifier,
+                                        scope =>
                                         {
                                             var serviceProvider = serviceDescriptor.Lifetime == ServiceLifetime.Scoped
                                                 ? scope.Resolve<IServiceProvider>()
                                                 : container.Resolve<IServiceProvider>();
                                             var instance = serviceDescriptor.ImplementationFactory(serviceProvider);
                                             return instance;
-                                        }));
+                                        },
+                                       (IFactoryLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
             }
             else if (serviceDescriptor.ImplementationInstance != null)
             {
                 container.RegisterInstance(serviceDescriptor.ServiceType,
                                            qualifier,
                                            serviceDescriptor.ImplementationInstance,
-                                           serviceDescriptor.GetLifetime(lifetime));
+                                           (IInstanceLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
             }
             else
             {
