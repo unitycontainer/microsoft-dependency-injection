@@ -5,7 +5,8 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
 {
     public class InjectionSingletonLifetimeManager : SynchronizedLifetimeManager, 
                                                      IInstanceLifetimeManager, 
-                                                     IFactoryLifetimeManager
+                                                     IFactoryLifetimeManager,
+                                                     ITypeLifetimeManager
     {
         #region Fields
 

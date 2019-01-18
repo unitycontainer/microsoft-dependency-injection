@@ -8,7 +8,9 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
     /// except it makes container remember all Disposable objects it created. Once container
     /// is disposed all these objects are disposed as well.
     /// </summary>
-    internal class InjectionTransientLifetimeManager : LifetimeManager, IFactoryLifetimeManager
+    internal class InjectionTransientLifetimeManager : LifetimeManager, 
+                                                       IFactoryLifetimeManager,
+                                                       ITypeLifetimeManager
     {
         public override void SetValue(object newValue, ILifetimeContainer container = null)
         {

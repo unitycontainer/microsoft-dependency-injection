@@ -42,7 +42,7 @@ namespace Unity.Microsoft.DependencyInjection
                 container.RegisterType(serviceDescriptor.ServiceType,
                                        serviceDescriptor.ImplementationType,
                                        qualifier,
-                                       serviceDescriptor.GetLifetime(lifetime));
+                                       (ITypeLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
             }
             else if (serviceDescriptor.ImplementationFactory != null)
             {
