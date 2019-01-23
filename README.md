@@ -42,9 +42,22 @@ public void ConfigureContainer(IUnityContainer container)
 }
 ```
 
-### Startup
+### Resolving Startup
 
-Startup class instance is resolved from Unity if it is configured as default container. [An Issue resolved](https://github.com/aspnet/Hosting/issues/1309).
+Startup class instance is resolved from Unity if it is configured as default container.
+
+
+### Resolving Controllers from Unity
+
+By default ASP resolves controllers using built in activator. To enable resolution of controllers from Unity you need to add following line to MVC configuration:
+```C#
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMvc()
+            .SetCompatibilityVersion(CompatibilityVersion.Version_xxx) 
+            .AddControllersAsServices(); <-- Add this line
+}
+```
 
 ## Examples
 
