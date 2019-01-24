@@ -61,5 +61,5 @@ public void ConfigureServices(IServiceCollection services)
 
 ## Examples
 
-For example of using Unity with Core 2.0 Web application follow [this link](https://github.com/unitycontainer/examples/tree/master/src/AspNetCoreExample)
+For example of using Unity with Core 2.0 Web application follow [this link](https://github.com/unitycontainer/examples/tree/v5.x/src/web/ASP.Net.Unity.Example)
 
