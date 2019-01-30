@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <UnityContainerVersion>5.9.*</UnityContainerVersion>
+    <UnityContainerVersion>5.9</UnityContainerVersion>
   </PropertyGroup>
 
 </Project>
