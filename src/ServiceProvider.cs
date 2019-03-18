@@ -16,7 +16,7 @@ namespace Unity.Microsoft.DependencyInjection
         {
             _container = container;
             _container.RegisterInstance<IServiceScope>(this, new ExternallyControlledLifetimeManager());
-            _container.RegisterInstance<IServiceProvider>(this, new ExternallyControlledLifetimeManager());
+            _container.RegisterInstance<IServiceProvider>(this, new ContainerControlledLifetimeManager());
             _container.RegisterInstance<IServiceScopeFactory>(this, new ExternallyControlledLifetimeManager());
         }
 
@@ -73,12 +73,6 @@ namespace Unity.Microsoft.DependencyInjection
         #region Disposable
 
         public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool _)
         {
             IDisposable disposable = _container;
             _container = null;
