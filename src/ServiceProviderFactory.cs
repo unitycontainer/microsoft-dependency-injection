@@ -7,7 +7,14 @@ namespace Unity.Microsoft.DependencyInjection
     public class ServiceProviderFactory : IServiceProviderFactory<IUnityContainer>,
                                           IServiceProviderFactory<IServiceCollection>
     {
+        #region Fields
+
         private readonly IUnityContainer _container;
+
+        #endregion
+
+
+        #region Constructors
 
         public ServiceProviderFactory(IUnityContainer container)
         {
@@ -17,14 +24,14 @@ namespace Unity.Microsoft.DependencyInjection
             _container.RegisterInstance<IServiceProviderFactory<IServiceCollection>>(this, new ExternallyControlledLifetimeManager());
         }
 
+        #endregion
+
+
+        #region IServiceProviderFactory<IUnityContainer>
+
         public IServiceProvider CreateServiceProvider(IUnityContainer container)
         {
             return new ServiceProvider(container);
-        }
-
-        public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
-        {
-            return new ServiceProvider(CreateServiceProviderContainer(containerBuilder));
         }
 
         IUnityContainer IServiceProviderFactory<IUnityContainer>.CreateBuilder(IServiceCollection services)
@@ -32,11 +39,25 @@ namespace Unity.Microsoft.DependencyInjection
             return CreateServiceProviderContainer(services);
         }
 
+        #endregion
+
+
+        #region IServiceProviderFactory<IServiceCollection>
+
+        public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
+        {
+            return new ServiceProvider(CreateServiceProviderContainer(containerBuilder));
+        }
+
         IServiceCollection IServiceProviderFactory<IServiceCollection>.CreateBuilder(IServiceCollection services)
         {
             return services;
         }
 
+        #endregion
+
+
+        #region Implementation
 
         private IUnityContainer CreateServiceProviderContainer(IServiceCollection services)
         {
@@ -46,5 +67,7 @@ namespace Unity.Microsoft.DependencyInjection
             return ((UnityContainer)container).AddExtension(new MdiExtension())
                             .AddServices(services);
         }
+
+        #endregion
     }
 }

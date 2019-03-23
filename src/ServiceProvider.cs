@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using Unity.Lifetime;
+using Unity.Microsoft.DependencyInjection.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {
@@ -16,7 +17,7 @@ namespace Unity.Microsoft.DependencyInjection
         {
             _container = container;
             _container.RegisterInstance<IServiceScope>(this, new ExternallyControlledLifetimeManager());
-            _container.RegisterInstance<IServiceProvider>(this, new ContainerControlledLifetimeManager());
+            _container.RegisterInstance<IServiceProvider>(this, new ServiceProviderLifetimeManager(this));
             _container.RegisterInstance<IServiceScopeFactory>(this, new ExternallyControlledLifetimeManager());
         }
 
@@ -74,9 +75,12 @@ namespace Unity.Microsoft.DependencyInjection
 
         public void Dispose()
         {
-            IDisposable disposable = _container;
-            _container = null;
-            disposable?.Dispose();
+            // TODO: Disabled until these issues are resolved
+            // https://github.com/unitycontainer/microsoft-dependency-injection/issues/40
+            // https://github.com/aspnet/Extensions/issues/1301
+            //IDisposable disposable = _container;
+            //_container = null;
+            //disposable?.Dispose();
         }
 
         #endregion
