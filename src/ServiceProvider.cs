@@ -75,12 +75,9 @@ namespace Unity.Microsoft.DependencyInjection
 
         public void Dispose()
         {
-            // TODO: Disabled until these issues are resolved
-            // https://github.com/unitycontainer/microsoft-dependency-injection/issues/40
-            // https://github.com/aspnet/Extensions/issues/1301
-            //IDisposable disposable = _container;
-            //_container = null;
-            //disposable?.Dispose();
+            IDisposable disposable = _container;
+            _container = null;
+            disposable?.Dispose();
         }
 
         #endregion
