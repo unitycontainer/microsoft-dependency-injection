@@ -11,7 +11,7 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
         #region Fields
 
         private readonly ILifetimeContainer _container;
-        private object _value;
+        private object _value = NoValue;
 
         #endregion
 
@@ -42,12 +42,12 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
         /// <param name="container">Instance of container</param>
         public override void RemoveValue(ILifetimeContainer container = null)
         {
-            if (_value == null) return;
+            if (NoValue == _value) return;
             if (_value is IDisposable disposable)
             {
                 disposable.Dispose();
             }
-            _value = null;
+            _value = NoValue;
         }
 
         protected override LifetimeManager OnCreateLifetimeManager()
