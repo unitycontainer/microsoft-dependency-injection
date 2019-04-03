@@ -18,20 +18,12 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
                 container?.Add(disposable);
         }
 
-        public override object GetValue(ILifetimeContainer container = null)
-        {
-            return null;
-        }
+        protected override LifetimeManager OnCreateLifetimeManager() => this;
 
-        public override void RemoveValue(ILifetimeContainer container = null)
+        public override bool InUse
         {
+            get => false;
+            set { }
         }
-
-        protected override LifetimeManager OnCreateLifetimeManager()
-        {
-            return this;
-        }
-
-        public override bool InUse { get => false; set => base.InUse = false; }
     }
 }
