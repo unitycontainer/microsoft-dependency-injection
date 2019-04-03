@@ -30,6 +30,9 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <TargetFrameworks>netcoreapp1.1;netstandard2.0</TargetFrameworks>
     <DebugType>Portable</DebugType>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>package.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
 
