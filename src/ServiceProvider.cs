@@ -25,6 +25,11 @@ namespace Unity.Microsoft.DependencyInjection
 
         public object GetService(Type serviceType)
         {
+            if (null == _container)
+            {
+                throw new ObjectDisposedException(nameof(IServiceProvider));
+            }
+
             try
             {
                 return _container.Resolve(serviceType);
