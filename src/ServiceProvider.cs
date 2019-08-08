@@ -25,9 +25,9 @@ namespace Unity.Microsoft.DependencyInjection
 
         public object GetService(Type serviceType)
         {
-            if (null == _container)
+            if (_container == null)
             {
-                throw new ObjectDisposedException(nameof(IServiceProvider));
+                throw new ObjectDisposedException(nameof(IUnityContainer));
             }
 
             try
@@ -78,11 +78,23 @@ namespace Unity.Microsoft.DependencyInjection
 
         #region Disposable
 
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _container?.Dispose();
+            }
+        }
+
         public void Dispose()
         {
-            IDisposable disposable = _container;
-            _container = null;
-            disposable?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~ServiceProvider()
+        {
+            Dispose(false);
         }
 
         #endregion
