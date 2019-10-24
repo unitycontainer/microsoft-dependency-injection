@@ -3,8 +3,8 @@
   <Import Project="..\package.props" />
 
   <PropertyGroup>
-    <FileVersion>$(Version).0</FileVersion>
-    <AssemblyVersion>$(Version).0</AssemblyVersion>
+    <FileVersion>5.11.1.0</FileVersion>
+    <AssemblyVersion>5.11.1.0</AssemblyVersion>
     <PackageId>Unity.Microsoft.DependencyInjection</PackageId>
     <Description>Unity for Microsoft Dependency Injection framework.</Description>
     <Copyright>Copyright © Unity Container Project 2018</Copyright>
@@ -46,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('$(UnityContainer)')">
-    <PackageReference Include="Unity.Container" Version="$(UnityContainerVersion)" />
+    <PackageReference Include="Unity.Container" Version="5.11.1" />
   </ItemGroup>
 
 
@@ -57,7 +57,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" /> 
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.0.0" /> 
   </ItemGroup>
 
   <!-- Sourcelink -->
@@ -65,6 +65,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <Version>5.11.1-beta</Version>
   </PropertyGroup>
 
   <ItemGroup>
