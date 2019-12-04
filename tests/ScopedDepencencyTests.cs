@@ -17,8 +17,6 @@ namespace Unity.Microsoft.DependencyInjection.Tests
             var provider = collection.BuildServiceProvider();
 
             // Act
-            //var rootTransient = provider.GetService<Transient>();
-            
             ITransient transient1 = null;
             ITransient transient2a = null;
             ITransient transient2b = null;
