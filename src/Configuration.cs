@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Unity.Lifetime;
 using Unity.Microsoft.DependencyInjection.Lifetime;
-using Unity.Policy;
-using Unity.Registration;
 
 namespace Unity.Microsoft.DependencyInjection
 {
@@ -15,28 +12,15 @@ namespace Unity.Microsoft.DependencyInjection
         internal static IUnityContainer AddServices(this IUnityContainer container, IServiceCollection services)
         {
             var lifetime = ((UnityContainer)container).Configure<MdiExtension>().Lifetime;
+            var registerFunc = ((UnityContainer)container).Register;
 
-            Func<Type, string, InternalRegistration, IPolicySet> registerFunc = ((UnityContainer)container).Register;
+            ((UnityContainer)container).Register = ((UnityContainer)container).AppendNew;
 
-            ((UnityContainer)container).Register = OnRegister;
-
-
-            foreach (var descriptor in services)
-            {
-                container.Register(descriptor, lifetime);
-            }
+            foreach (var descriptor in services) container.Register(descriptor, lifetime);
 
             ((UnityContainer)container).Register = registerFunc;
 
             return container;
-
-
-            IPolicySet OnRegister(Type type, string name, InternalRegistration registration)
-            {
-                registerFunc(type, null, registration);
-                registerFunc(type, Guid.NewGuid().ToString(), registration);
-                return null;
-            }
         }
 
 
@@ -45,9 +29,10 @@ namespace Unity.Microsoft.DependencyInjection
         {
             if (serviceDescriptor.ImplementationType != null)
             {
+                var name = serviceDescriptor.ServiceType.IsGenericTypeDefinition ? UnityContainer.All : null;
                 container.RegisterType(serviceDescriptor.ServiceType,
                                        serviceDescriptor.ImplementationType,
-                                       null,
+                                       name,
                                        (ITypeLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
             }
             else if (serviceDescriptor.ImplementationFactory != null)

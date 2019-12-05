@@ -16,46 +16,53 @@ namespace Unity.Microsoft.DependencyInjection.Tests
             return serviceCollection.BuildServiceProvider();
         }
 
-        [Theory]
-        [InlineData(typeof(IFakeService), typeof(FakeService), typeof(IFakeService), ServiceLifetime.Scoped)]
-        [InlineData(typeof(IFakeService), typeof(FakeService), typeof(IFakeService), ServiceLifetime.Singleton)]
-        [InlineData(typeof(IFakeOpenGenericService<>), typeof(FakeOpenGenericService<>), typeof(IFakeOpenGenericService<IServiceProvider>), ServiceLifetime.Scoped)]
-        [InlineData(typeof(IFakeOpenGenericService<>), typeof(FakeOpenGenericService<>), typeof(IFakeOpenGenericService<IServiceProvider>), ServiceLifetime.Singleton)]
-        public void Resolves_DifferentInstancesForServiceWhenResolvingEnumerable(Type serviceType, Type implementation, Type resolve, ServiceLifetime lifetime)
+        [Fact]
+#pragma warning disable xUnit1024 // Test methods cannot have overloads
+        public new void DisposesInReverseOrderOfCreation()
+#pragma warning restore xUnit1024 // Test methods cannot have overloads
         {
             // Arrange
-            var serviceCollection = new TestServiceCollection
-            {
-                ServiceDescriptor.Describe(serviceType, implementation, lifetime),
-                ServiceDescriptor.Describe(serviceType, implementation, lifetime),
-                ServiceDescriptor.Describe(serviceType, implementation, lifetime)
-            };
-
+            var serviceCollection = new TestServiceCollection();
+            serviceCollection.AddSingleton<FakeDisposeCallback>();
+            serviceCollection.AddTransient<IFakeOuterService, FakeDisposableCallbackOuterService>();
+            serviceCollection.AddSingleton<IFakeMultipleService, FakeDisposableCallbackInnerService>();
+            serviceCollection.AddScoped<IFakeMultipleService, FakeDisposableCallbackInnerService>();
+            serviceCollection.AddTransient<IFakeMultipleService, FakeDisposableCallbackInnerService>();
+            serviceCollection.AddSingleton<IFakeService, FakeDisposableCallbackInnerService>();
             var serviceProvider = CreateServiceProvider(serviceCollection);
-            using (var scope = serviceProvider.CreateScope())
+
+            var callback = serviceProvider.GetService<FakeDisposeCallback>();
+            var outer = serviceProvider.GetService<IFakeOuterService>();
+            var multipleServices = outer.MultipleServices.ToArray();
+
+            // Act
+            ((IDisposable)serviceProvider).Dispose();
+
+            // Assert
+            Assert.Equal(outer, callback.Disposed[0]);
+            Assert.Equal(multipleServices.Reverse(), callback.Disposed.Skip(1).Take(3).OfType<IFakeMultipleService>());
+            Assert.Equal(outer.SingleService, callback.Disposed[4]);
+        }
+
+        public class FakeDisposableCallbackOuterService : FakeDisposableCallbackService, IFakeOuterService
+        {
+            public FakeDisposableCallbackOuterService(
+                IFakeService singleService,
+                IEnumerable<IFakeMultipleService> multipleServices,
+                FakeDisposeCallback callback) : base(callback)
             {
-                var type = typeof(IEnumerable<>).MakeGenericType(resolve);
-                var enumerable = (scope.ServiceProvider.GetService(type) as IEnumerable)
-                    .OfType<object>().ToArray();
-                var service = scope.ServiceProvider.GetService(resolve);
-
-                var hash = service.GetHashCode();
-                var mhash = enumerable.Select(e => e.GetHashCode()).ToArray();
-
-                // Assert
-                Assert.Equal(3, enumerable.Length);
-                Assert.NotNull(enumerable[0]);
-                Assert.NotNull(enumerable[1]);
-                Assert.NotNull(enumerable[2]);
-
-                Assert.NotEqual(enumerable[0], enumerable[1]);
-                Assert.NotEqual(enumerable[1], enumerable[2]);
-                Assert.Equal(service, enumerable[2]);
+                SingleService = singleService;
+                MultipleServices = multipleServices.ToArray();
             }
+
+            public IFakeService SingleService { get; }
+            public IEnumerable<IFakeMultipleService> MultipleServices { get; }
         }
 
         [Fact]
-        public void Resolves_MixedOpenClosedGenericsAsEnumerable()
+#pragma warning disable xUnit1024 // Test methods cannot have overloads
+        public new void ResolvesMixedOpenClosedGenericsAsEnumerable()
+#pragma warning restore xUnit1024 // Test methods cannot have overloads
         {
             // Arrange
             var serviceCollection = new TestServiceCollection();
@@ -69,6 +76,7 @@ namespace Unity.Microsoft.DependencyInjection.Tests
             var serviceProvider = CreateServiceProvider(serviceCollection);
 
             var enumerable = serviceProvider.GetService<IEnumerable<IFakeOpenGenericService<PocoClass>>>().ToArray();
+            var service = serviceProvider.GetService<IFakeOpenGenericService<PocoClass>>();
 
             // Assert
             Assert.Equal(3, enumerable.Length);
@@ -76,48 +84,11 @@ namespace Unity.Microsoft.DependencyInjection.Tests
             Assert.NotNull(enumerable[1]);
             Assert.NotNull(enumerable[2]);
 
-            //Assert.Equal(instance, enumerable[2]);
-            Assert.IsType<FakeService>(enumerable[0]);
+            Assert.Contains(instance, enumerable);
+            Assert.Equal(instance, service);
+            //Assert.IsType<FakeService>(enumerable[0]);
         }
     }
-
-
-    //public class FakeOpenGenericServic<TVal> : IFakeOpenGenericService<TVal>
-    //{
-    //    public readonly string id = Guid.NewGuid().ToString();
-
-    //    public FakeOpenGenericServic(TVal value)
-    //    {
-    //        Value = value;
-    //    }
-
-    //    public TVal Value { get; }
-    //}
-
-    public class FakeService : IFakeEveryService, IDisposable
-    {
-        public FakeService(IUnityContainer container)
-        {
-            Container = container;
-        }
-
-        public IUnityContainer Container { get; private set; }
-
-        public PocoClass Value { get; set; }
-
-        public bool Disposed { get; private set; }
-
-        public void Dispose()
-        {
-            if (Disposed)
-            {
-                throw new ObjectDisposedException(nameof(FakeService));
-            }
-
-            Disposed = true;
-        }
-    }
-
     internal class TestServiceCollection : List<ServiceDescriptor>, IServiceCollection
     {
     }
