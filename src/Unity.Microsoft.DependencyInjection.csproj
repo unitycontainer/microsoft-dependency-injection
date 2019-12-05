@@ -17,6 +17,9 @@
     <Authors>Unity Open Source Project</Authors>
     <Company>Unity Open Source Project</Company>
     <RootNamespace>Unity.Microsoft.DependencyInjection</RootNamespace>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>package.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
 
@@ -30,9 +33,6 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <TargetFrameworks>netcoreapp1.1;netstandard2.0</TargetFrameworks>
     <DebugType>Portable</DebugType>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>package.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
 

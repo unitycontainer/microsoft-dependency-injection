@@ -3,10 +3,7 @@ using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection.Lifetime
 {
-    public class InjectionSingletonLifetimeManager : SynchronizedLifetimeManager, 
-                                                     IInstanceLifetimeManager, 
-                                                     IFactoryLifetimeManager,
-                                                     ITypeLifetimeManager
+    public class InjectionSingletonLifetimeManager : SingletonLifetimeManager
     {
         #region Fields
 
@@ -21,6 +18,7 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
         public InjectionSingletonLifetimeManager(ILifetimeContainer container)
         {
             _container = container ?? throw new ArgumentNullException(nameof(container));
+            Scope = _container.Container;
         }
 
         #endregion

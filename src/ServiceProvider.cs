@@ -12,6 +12,10 @@ namespace Unity.Microsoft.DependencyInjection
     {
         private IUnityContainer _container;
 
+#if DEBUG
+        private string id = Guid.NewGuid().ToString();
+#endif
+
 
         internal ServiceProvider(IUnityContainer container)
         {

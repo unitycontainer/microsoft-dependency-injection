@@ -5,49 +5,55 @@ using System.Linq;
 using System.Reflection;
 using Unity.Lifetime;
 using Unity.Microsoft.DependencyInjection.Lifetime;
+using Unity.Policy;
+using Unity.Registration;
 
 namespace Unity.Microsoft.DependencyInjection
 {
     internal static class Configuration
     {
-
         internal static IUnityContainer AddServices(this IUnityContainer container, IServiceCollection services)
         {
-            var lifetime = ((UnityContainer)container).Configure<MdiExtension>()
-                                    .Lifetime;
+            var lifetime = ((UnityContainer)container).Configure<MdiExtension>().Lifetime;
 
-            foreach (var group in services.GroupBy(serviceDescriptor => serviceDescriptor.ServiceType,
-                                                   serviceDescriptor => serviceDescriptor)
-                                          .Select(group => group.ToArray()))
+            Func<Type, string, InternalRegistration, IPolicySet> registerFunc = ((UnityContainer)container).Register;
+
+            ((UnityContainer)container).Register = OnRegister;
+
+
+            foreach (var descriptor in services)
             {
-                // Register named types
-                for (var i = 0; i < group.Length - 1; i++)
-                {
-                    var descriptor = group[i];
-                    container.Register(descriptor, Guid.NewGuid().ToString(), lifetime);
-                }
-
-                // Register default types
-                container.Register(group[group.Length - 1], null, lifetime);
+                container.Register(descriptor, lifetime);
             }
 
+            ((UnityContainer)container).Register = registerFunc;
+
             return container;
+
+
+            IPolicySet OnRegister(Type type, string name, InternalRegistration registration)
+            {
+                registerFunc(type, null, registration);
+                registerFunc(type, Guid.NewGuid().ToString(), registration);
+                return null;
+            }
         }
 
+
         internal static void Register(this IUnityContainer container,
-            ServiceDescriptor serviceDescriptor, string qualifier, ILifetimeContainer lifetime)
+            ServiceDescriptor serviceDescriptor, ILifetimeContainer lifetime)
         {
             if (serviceDescriptor.ImplementationType != null)
             {
                 container.RegisterType(serviceDescriptor.ServiceType,
                                        serviceDescriptor.ImplementationType,
-                                       qualifier,
+                                       null,
                                        (ITypeLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
             }
             else if (serviceDescriptor.ImplementationFactory != null)
             {
                 container.RegisterFactory(serviceDescriptor.ServiceType, 
-                                       qualifier,
+                                        null,
                                         scope =>
                                         {
                                             var serviceProvider = serviceDescriptor.Lifetime == ServiceLifetime.Scoped
@@ -61,7 +67,7 @@ namespace Unity.Microsoft.DependencyInjection
             else if (serviceDescriptor.ImplementationInstance != null)
             {
                 container.RegisterInstance(serviceDescriptor.ServiceType,
-                                           qualifier,
+                                           null,
                                            serviceDescriptor.ImplementationInstance,
                                            (IInstanceLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
             }

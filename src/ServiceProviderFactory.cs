@@ -19,6 +19,7 @@ namespace Unity.Microsoft.DependencyInjection
         public ServiceProviderFactory(IUnityContainer container)
         {
             _container = container ?? new UnityContainer();
+            ((UnityContainer)_container).AddExtension(new MdiExtension());
 
             _container.RegisterInstance<IServiceProviderFactory<IUnityContainer>>(this, new ContainerControlledLifetimeManager());
             _container.RegisterInstance<IServiceProviderFactory<IServiceCollection>>(this, new ExternallyControlledLifetimeManager());
