@@ -66,7 +66,7 @@ namespace Unity.Microsoft.DependencyInjection
             new ServiceProviderFactory(container);
 
             return ((UnityContainer)container).AddExtension(new MdiExtension())
-                            .AddServices(services);
+                                              .AddServices(services);
         }
 
         #endregion

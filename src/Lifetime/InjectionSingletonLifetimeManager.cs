@@ -3,12 +3,12 @@ using Unity.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection.Lifetime
 {
-    public class InjectionSingletonLifetimeManager : SingletonLifetimeManager
+    public class InjectionSingletonLifetimeManager : ContainerControlledLifetimeManager
     {
         #region Fields
 
         private readonly ILifetimeContainer _container;
-        private object _value = NoValue;
+        private bool _disposed;
 
         #endregion
 
@@ -16,6 +16,7 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
         #region Constructors
 
         public InjectionSingletonLifetimeManager(ILifetimeContainer container)
+            : base()
         {
             _container = container ?? throw new ArgumentNullException(nameof(container));
             Scope = _container.Container;
@@ -26,26 +27,14 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
 
         #region LifetimeManager
 
-        protected override object SynchronizedGetValue(ILifetimeContainer container) => _value;
-
         protected override void SynchronizedSetValue(object newValue, ILifetimeContainer container)
         {
-            _value = newValue;
-            if (_value is IDisposable) _container.Add(new DisposableAction(() => RemoveValue(_container)));
-        }
-
-        /// <summary>
-        /// Remove the given object from backing store.
-        /// </summary>
-        /// <param name="container">Instance of container</param>
-        public override void RemoveValue(ILifetimeContainer container = null)
-        {
-            if (NoValue == _value) return;
-            if (_value is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-            _value = NoValue;
+            base.SynchronizedSetValue(newValue, container);
+            if (newValue is IDisposable) _container.Add(new DisposableAction(() => 
+            { 
+                RemoveValue(_container); 
+                _disposed = true; 
+            }));
         }
 
         protected override LifetimeManager OnCreateLifetimeManager()
@@ -53,6 +42,11 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
             return new InjectionSingletonLifetimeManager(_container);
         }
 
+        public override void RemoveValue(ILifetimeContainer container = null)
+        {
+            _disposed = true;
+            base.RemoveValue(container);
+        }
 
         #endregion
 
