@@ -25,5 +25,17 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
             get => false;
             set { }
         }
+
+
+
+        #region Overrides
+
+        /// <summary>
+        /// This method provides human readable representation of the lifetime
+        /// </summary>
+        /// <returns>Name of the lifetime</returns>
+        public override string ToString() => "Lifetime:InjectionTransient";
+
+        #endregion
     }
 }

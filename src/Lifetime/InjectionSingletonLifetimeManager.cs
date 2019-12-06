@@ -8,7 +8,6 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
         #region Fields
 
         private readonly ILifetimeContainer _container;
-        private bool _disposed;
 
         #endregion
 
@@ -30,11 +29,7 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
         protected override void SynchronizedSetValue(object newValue, ILifetimeContainer container)
         {
             base.SynchronizedSetValue(newValue, container);
-            if (newValue is IDisposable) _container.Add(new DisposableAction(() => 
-            { 
-                RemoveValue(_container); 
-                _disposed = true; 
-            }));
+            if (newValue is IDisposable) _container.Add(new DisposableAction(() => RemoveValue(_container) ));
         }
 
         protected override LifetimeManager OnCreateLifetimeManager()
@@ -42,11 +37,16 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
             return new InjectionSingletonLifetimeManager(_container);
         }
 
-        public override void RemoveValue(ILifetimeContainer container = null)
-        {
-            _disposed = true;
-            base.RemoveValue(container);
-        }
+        #endregion
+
+
+        #region Overrides
+
+        /// <summary>
+        /// This method provides human readable representation of the lifetime
+        /// </summary>
+        /// <returns>Name of the lifetime</returns>
+        public override string ToString() => "Lifetime:InjectionPerContainer";
 
         #endregion
 
