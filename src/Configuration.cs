@@ -41,9 +41,7 @@ namespace Unity.Microsoft.DependencyInjection
                                         null,
                                         scope =>
                                         {
-                                            var serviceProvider = serviceDescriptor.Lifetime == ServiceLifetime.Scoped
-                                                ? scope.Resolve<IServiceProvider>()
-                                                : container.Resolve<IServiceProvider>();
+                                            var serviceProvider = scope.Resolve<IServiceProvider>();
                                             var instance = serviceDescriptor.ImplementationFactory(serviceProvider);
                                             return instance;
                                         },

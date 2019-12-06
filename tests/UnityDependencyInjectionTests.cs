@@ -2,12 +2,11 @@
 using Microsoft.Extensions.DependencyInjection.Specification;
 using Microsoft.Extensions.DependencyInjection.Specification.Fakes;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace Unity.Microsoft.DependencyInjection.Tests
+namespace Unity.Microsoft.DependencyInjection.Specification.Tests
 {
     public class Tests : DependencyInjectionSpecificationTests
     {

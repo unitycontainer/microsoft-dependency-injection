@@ -1,14 +1,46 @@
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
+using Unity;
 using Unity.Microsoft.DependencyInjection;
 using Xunit;
 
-namespace UnitTests
+namespace Unity.Microsoft.DependencyInjection.Unit.Tests
 {
     public class ScopedDepencencyTests
     {
         [Fact]
-        public void ScopedDependencyFromTransientFactoryNotSharedAcrossScopes()
+        public void aspnet_Extensions_issues_1301()
+        {
+            var services = new TestServiceCollection()
+                .AddSingleton<Foo>();
+            
+            var provider = services.BuildServiceProvider();
+
+            IServiceProvider scopedSp1 = null;
+            IServiceProvider scopedSp2 = null;
+            Foo foo1 = null;
+            Foo foo2 = null;
+
+            using (var scope1 = provider.CreateScope())
+            {
+                scopedSp1 = scope1.ServiceProvider;
+                foo1 = scope1.ServiceProvider.GetRequiredService<Foo>();
+            }
+
+            using (var scope2 = provider.CreateScope())
+            {
+                scopedSp2 = scope2.ServiceProvider;
+                foo2 = scope2.ServiceProvider.GetRequiredService<Foo>();
+            }
+
+            Assert.Equal(foo1.ServiceProvider, foo2.ServiceProvider);
+            Assert.NotEqual(foo1.ServiceProvider, scopedSp1);
+            Assert.NotEqual(foo2.ServiceProvider, scopedSp2);
+        }
+
+        [Fact]
+        public void ScopedDependencyFromFactoryNotSharedAcrossScopes()
         {
             // Arrange
             var collection = new TestServiceCollection()
@@ -18,54 +50,99 @@ namespace UnitTests
             var provider = collection.BuildServiceProvider();
 
             // Act
-            ITransient transient1 = null;
-            ITransient transient2a = null;
+            ITransient transient1a = null;
+            ITransient transient1b = null;
             ITransient transient2b = null;
 
             using (var scope1 = provider.CreateScope())
             {
-                transient1 = scope1.ServiceProvider.GetService<ITransient>();
+                transient1a = scope1.ServiceProvider.GetService<ITransient>();
             }
 
             using (var scope2 = provider.CreateScope())
             {
-                transient2a = scope2.ServiceProvider.GetService<ITransient>();
+                transient1b = scope2.ServiceProvider.GetService<ITransient>();
                 transient2b = scope2.ServiceProvider.GetService<ITransient>();
             }
 
             // Assert
-            Assert.NotSame(transient1, transient2a);
-            Assert.NotSame(transient2a, transient2b);
-            Assert.NotSame(transient1.ScopedDependency, transient2a.ScopedDependency);
-            Assert.Same(transient2a.ScopedDependency, transient2b.ScopedDependency);
+            Assert.NotSame(transient1a, transient1b);
+            Assert.NotSame(transient1b, transient2b);
+            Assert.NotSame(transient1a.ScopedDependency, transient1b.ScopedDependency);
+            Assert.Same(transient1b.ScopedDependency, transient2b.ScopedDependency);
         }
 
-        private ITransient CreateTransientFactory(System.IServiceProvider provider)
+        [Fact]
+        public void ScopedDependencyFromTransientNotSharedAcrossScopes()
+        {
+            // Arrange
+            var collection = new TestServiceCollection()
+                                .AddTransient<ITransient, Transient>()
+                                .AddScoped<IScoped, Scoped>();
+
+            var provider = collection.BuildServiceProvider();
+
+            // Act
+            ITransient transient1a = null;
+            ITransient transient1b = null;
+            ITransient transient2b = null;
+
+            using (var scope1 = provider.CreateScope())
+            {
+                transient1a = scope1.ServiceProvider.GetService<ITransient>();
+            }
+
+            using (var scope2 = provider.CreateScope())
+            {
+                transient1b = scope2.ServiceProvider.GetService<ITransient>();
+                transient2b = scope2.ServiceProvider.GetService<ITransient>();
+            }
+
+            // Assert
+            Assert.NotSame(transient1a, transient1b);
+            Assert.NotSame(transient1b, transient2b);
+            Assert.NotSame(transient1a.ScopedDependency, transient1b.ScopedDependency);
+            Assert.Same(transient1b.ScopedDependency, transient2b.ScopedDependency);
+        }
+
+        private ITransient CreateTransientFactory(IServiceProvider provider)
         {
             return provider.GetRequiredService<Transient>();
         }
+    }
 
-        public interface ITransient
+    public class Foo
+    {
+        public Foo(IServiceProvider sp)
         {
-            IScoped ScopedDependency { get; }
+            ServiceProvider = sp;
         }
 
-        public class Transient : ITransient
-        {
-            public Transient(IScoped scoped)
-            {
-                ScopedDependency = scoped;
-            }
+        public IServiceProvider ServiceProvider { get; }
+    }
 
-            public IScoped ScopedDependency { get; }
+    public interface ITransient
+    {
+        IScoped ScopedDependency { get; }
+    }
+
+    public class Transient : ITransient
+    {
+        string ID { get; } = Guid.NewGuid().ToString();
+
+        public Transient(IScoped scoped)
+        {
+            ScopedDependency = scoped;
         }
 
-        public interface IScoped { }
+        public IScoped ScopedDependency { get; }
+    }
 
-        public class Scoped : IScoped
-        {
-        }
+    public interface IScoped { }
 
+    public class Scoped : IScoped
+    {
+        string ID { get; } = Guid.NewGuid().ToString();
     }
 
     internal class TestServiceCollection : List<ServiceDescriptor>, IServiceCollection
