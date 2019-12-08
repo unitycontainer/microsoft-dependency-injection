@@ -17,49 +17,6 @@ namespace Unity.Microsoft.DependencyInjection.Specification.Tests
 
         [Fact]
 #pragma warning disable xUnit1024 // Test methods cannot have overloads
-        public new void DisposesInReverseOrderOfCreation()
-#pragma warning restore xUnit1024 // Test methods cannot have overloads
-        {
-            // Arrange
-            var serviceCollection = new TestServiceCollection();
-            serviceCollection.AddSingleton<FakeDisposeCallback>();
-            serviceCollection.AddTransient<IFakeOuterService, FakeDisposableCallbackOuterService>();
-            serviceCollection.AddSingleton<IFakeMultipleService, FakeDisposableCallbackInnerService>();
-            serviceCollection.AddScoped<IFakeMultipleService, FakeDisposableCallbackInnerService>();
-            serviceCollection.AddTransient<IFakeMultipleService, FakeDisposableCallbackInnerService>();
-            serviceCollection.AddSingleton<IFakeService, FakeDisposableCallbackInnerService>();
-            var serviceProvider = CreateServiceProvider(serviceCollection);
-
-            var callback = serviceProvider.GetService<FakeDisposeCallback>();
-            var outer = serviceProvider.GetService<IFakeOuterService>();
-            var multipleServices = outer.MultipleServices.ToArray();
-
-            // Act
-            ((IDisposable)serviceProvider).Dispose();
-
-            // Assert
-            Assert.Equal(outer, callback.Disposed[0]);
-            Assert.Equal(multipleServices.Reverse(), callback.Disposed.Skip(1).Take(3).OfType<IFakeMultipleService>());
-            Assert.Equal(outer.SingleService, callback.Disposed[4]);
-        }
-
-        public class FakeDisposableCallbackOuterService : FakeDisposableCallbackService, IFakeOuterService
-        {
-            public FakeDisposableCallbackOuterService(
-                IFakeService singleService,
-                IEnumerable<IFakeMultipleService> multipleServices,
-                FakeDisposeCallback callback) : base(callback)
-            {
-                SingleService = singleService;
-                MultipleServices = multipleServices.ToArray();
-            }
-
-            public IFakeService SingleService { get; }
-            public IEnumerable<IFakeMultipleService> MultipleServices { get; }
-        }
-
-        [Fact]
-#pragma warning disable xUnit1024 // Test methods cannot have overloads
         public new void ResolvesMixedOpenClosedGenericsAsEnumerable()
 #pragma warning restore xUnit1024 // Test methods cannot have overloads
         {
@@ -85,9 +42,10 @@ namespace Unity.Microsoft.DependencyInjection.Specification.Tests
 
             Assert.Contains(instance, enumerable);
             Assert.Equal(instance, service);
-            //Assert.IsType<FakeService>(enumerable[0]);
+            Assert.IsType<FakeService>(enumerable[0]);
         }
     }
+
     internal class TestServiceCollection : List<ServiceDescriptor>, IServiceCollection
     {
     }
