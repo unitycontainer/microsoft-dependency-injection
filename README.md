@@ -53,9 +53,9 @@ By default ASP resolves controllers using built in activator. To enable resoluti
 ```C#
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddMvc()
-            .SetCompatibilityVersion(CompatibilityVersion.Version_xxx) 
-            .AddControllersAsServices(); <-- Add this line
+    ...
+    services.AddControllersAsServices(); <-- Add this line
+    ...
 }
 ```
 
