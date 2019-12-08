@@ -1,8 +1,8 @@
 <Project>
 
   <PropertyGroup>
-    <Version>5.11.2</Version>
-    <PackageReleaseNotes>Bug fixes, dependency updates and minor performance optimizations </PackageReleaseNotes>
+    <Version>5.11.3</Version>
+    <PackageReleaseNotes>This release is competible with Core 3.1</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
