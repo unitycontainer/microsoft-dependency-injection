@@ -16,21 +16,25 @@ Install-Package Unity.Microsoft.DependencyInjection
 - In the `WebHostBuilder` add `UseUnityServiceProvider(...)` method
 
 ```C#
-public static IWebHost BuildWebHost(string[] args) =>
-    WebHost.CreateDefaultBuilder(args)
-           .UseUnityServiceProvider()   <---- Add this line
-           .UseStartup<Startup>()
-           .Build();
+public static IHostBuilder CreateHostBuilder(string[] args) =>
+    Host.CreateDefaultBuilder(args)
+        .UseUnityServiceProvider()   <---- Add this line
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.UseStartup<Startup>();
+        });
 ```
 
 - In case Unity container configured via application configuration or by convention this container could be used to initialize service provider.
 
 ```C#
-public static IWebHost BuildWebHost(string[] args) =>
-    WebHost.CreateDefaultBuilder(args)
-           .UseUnityServiceProvider(_container)   <---- or add this line
-           .UseStartup<Startup>()
-           .Build();
+public static IHostBuilder CreateHostBuilder(string[] args) =>
+    Host.CreateDefaultBuilder(args)
+        .UseUnityServiceProvider(_container)   <---- Add this line
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.UseStartup<Startup>();
+        });
 ```
 
 - Add optional method to your `Startup` class
