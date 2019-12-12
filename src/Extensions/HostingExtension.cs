@@ -14,11 +14,12 @@ namespace Unity.Microsoft.DependencyInjection
         {
             _factory = new ServiceProviderFactory(container);
 
-            return hostBuilder.ConfigureServices((context, services) =>
-            {
-                services.Replace(ServiceDescriptor.Singleton<IServiceProviderFactory<IUnityContainer>>(_factory));
-                services.Replace(ServiceDescriptor.Singleton<IServiceProviderFactory<IServiceCollection>>(_factory));
-            });
+            return hostBuilder.UseServiceProviderFactory<IUnityContainer>(_factory)
+                              .ConfigureServices((context, services) =>
+                              {
+                                  services.Replace(ServiceDescriptor.Singleton<IServiceProviderFactory<IUnityContainer>>(_factory));
+                                  services.Replace(ServiceDescriptor.Singleton<IServiceProviderFactory<IServiceCollection>>(_factory));
+                              });
         }
 
         public static IWebHostBuilder UseUnityServiceProvider(this IWebHostBuilder hostBuilder, IUnityContainer container = null)
