@@ -19,11 +19,5 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
         }
 
         protected override LifetimeManager OnCreateLifetimeManager() => this;
-
-        public override bool InUse
-        {
-            get => false;
-            set { }
-        }
     }
 }
