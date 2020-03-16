@@ -7,11 +7,20 @@ using Unity.Microsoft.DependencyInjection.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {
-    internal static class Configuration
+    public static class Configuration
     {
-        internal static IUnityContainer AddServices(this IUnityContainer container, IServiceCollection services)
+        public static IUnityContainer AddServices(this IUnityContainer container, IServiceCollection services)
         {
-            var lifetime = ((UnityContainer)container).Configure<MdiExtension>().Lifetime;
+            var extension = ((UnityContainer)container).Configure<MdiExtension>();
+
+            if (extension == null)
+            {
+                extension = new MdiExtension();
+                container.AddExtension(extension);
+            }
+
+            var lifetime = extension.Lifetime;
+            
             var registerFunc = ((UnityContainer)container).Register;
 
             ((UnityContainer)container).Register = ((UnityContainer)container).AppendNew;
