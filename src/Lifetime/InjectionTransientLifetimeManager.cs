@@ -9,8 +9,8 @@ namespace Unity.Microsoft.DependencyInjection.Lifetime
     /// is disposed all these objects are disposed as well.
     /// </summary>
     public class InjectionTransientLifetimeManager : LifetimeManager, 
-                                                       IFactoryLifetimeManager,
-                                                       ITypeLifetimeManager
+                                                     IFactoryLifetimeManager,
+                                                     ITypeLifetimeManager
     {
         public override void SetValue(object newValue, ILifetimeContainer container = null)
         {
