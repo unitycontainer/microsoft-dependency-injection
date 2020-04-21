@@ -16,21 +16,25 @@ Install-Package Unity.Microsoft.DependencyInjection
 - In the `WebHostBuilder` add `UseUnityServiceProvider(...)` method
 
 ```C#
-public static IWebHost BuildWebHost(string[] args) =>
-    WebHost.CreateDefaultBuilder(args)
-           .UseUnityServiceProvider()   <---- Add this line
-           .UseStartup<Startup>()
-           .Build();
+public static IHostBuilder CreateHostBuilder(string[] args) =>
+    Host.CreateDefaultBuilder(args)
+        .UseUnityServiceProvider()   <---- Add this line
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.UseStartup<Startup>();
+        });
 ```
 
 - In case Unity container configured via application configuration or by convention this container could be used to initialize service provider.
 
 ```C#
-public static IWebHost BuildWebHost(string[] args) =>
-    WebHost.CreateDefaultBuilder(args)
-           .UseUnityServiceProvider(_container)   <---- or add this line
-           .UseStartup<Startup>()
-           .Build();
+public static IHostBuilder CreateHostBuilder(string[] args) =>
+    Host.CreateDefaultBuilder(args)
+        .UseUnityServiceProvider(_container)   <---- Add this line
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.UseStartup<Startup>();
+        });
 ```
 
 - Add optional method to your `Startup` class
@@ -42,24 +46,19 @@ public void ConfigureContainer(IUnityContainer container)
 }
 ```
 
-### Resolving Startup
-
-Startup class instance is resolved from Unity if it is configured as default container.
-
-
 ### Resolving Controllers from Unity
 
 By default ASP resolves controllers using built in activator. To enable resolution of controllers from Unity you need to add following line to MVC configuration:
 ```C#
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddMvc()
-            .SetCompatibilityVersion(CompatibilityVersion.Version_xxx) 
-            .AddControllersAsServices(); <-- Add this line
+    ...
+    services.AddControllersAsServices(); <-- Add this line
+    ...
 }
 ```
 
 ## Examples
 
-For example of using Unity with Core 2.0 Web application follow [this link](https://github.com/unitycontainer/examples/tree/v5.x/src/web/ASP.Net.Unity.Example)
+For example of using Unity with Core 3.1 Web application follow [this link](https://github.com/unitycontainer/examples/tree/master/src/web/ASP.Net.Unity.Example)
 
