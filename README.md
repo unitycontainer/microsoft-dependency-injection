@@ -4,15 +4,19 @@
 [![NuGet](https://img.shields.io/nuget/v/Unity.Microsoft.DependencyInjection.svg)](https://www.nuget.org/packages/Unity.Microsoft.DependencyInjection)
 
 # Unity.Microsoft.DependencyInjection
+
 Unity extension to integrate with [Microsoft.Extensions.DependencyInjection](https://github.com/aspnet/DependencyInjection)  compliant systems
 
 ## Getting Started
+
 - Reference the `Unity.Microsoft.DependencyInjection` package from NuGet.
-```
+
+```shell
 Install-Package Unity.Microsoft.DependencyInjection
 ```
 
 ## Registration:
+
 - In the `WebHostBuilder` add `UseUnityServiceProvider(...)` method
 
 ```C#
@@ -38,6 +42,7 @@ public static IHostBuilder CreateHostBuilder(string[] args) =>
 ```
 
 - Add optional method to your `Startup` class
+
 ```C#
 public void ConfigureContainer(IUnityContainer container)
 {
@@ -49,6 +54,7 @@ public void ConfigureContainer(IUnityContainer container)
 ### Resolving Controllers from Unity
 
 By default ASP resolves controllers using built in activator. To enable resolution of controllers from Unity you need to add following line to MVC configuration:
+
 ```C#
 public void ConfigureServices(IServiceCollection services)
 {
@@ -62,3 +68,14 @@ public void ConfigureServices(IServiceCollection services)
 
 For example of using Unity with Core 3.1 Web application follow [this link](https://github.com/unitycontainer/examples/tree/master/src/web/ASP.Net.Unity.Example)
 
+## Code of Conduct
+
+This project has adopted the code of conduct defined by the [Contributor Covenant](https://www.contributor-covenant.org/) to clarify expected behavior in our community. For more information, see the [.NET Foundation Code of Conduct](https://www.dotnetfoundation.org/code-of-conduct)
+
+## Contributing
+
+See the [Contributing guide](https://github.com/unitycontainer/unity/blob/master/CONTRIBUTING.md) for more information.
+
+## .NET Foundation
+
+Unity Container is a [.NET Foundation](https://dotnetfoundation.org/projects/unitycontainer) project
