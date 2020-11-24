@@ -34,7 +34,7 @@ public static IHostBuilder CreateHostBuilder(string[] args) =>
 ```C#
 public static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
-        .UseUnityServiceProvider(_container)   <---- Add this line
+        .UseUnityServiceProvider(_container)   //<---- Add this line
         .ConfigureWebHostDefaults(webBuilder =>
         {
             webBuilder.UseStartup<Startup>();
@@ -59,7 +59,9 @@ By default ASP resolves controllers using built in activator. To enable resoluti
 public void ConfigureServices(IServiceCollection services)
 {
     ...
-    services.AddControllersAsServices(); <-- Add this line
+    services.AddMvc()
+        .AddControllersAsServices()  //<-- Add this line
+        .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
     ...
 }
 ```
