@@ -1,8 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using Unity;
-using Unity.Microsoft.DependencyInjection;
 using Xunit;
 
 namespace Unity.Microsoft.DependencyInjection.Unit.Tests

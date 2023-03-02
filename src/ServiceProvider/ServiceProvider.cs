@@ -8,7 +8,8 @@ namespace Unity.Microsoft.DependencyInjection
     public class ServiceProvider : IServiceProvider, 
                                    ISupportRequiredService,
                                    IServiceScopeFactory, 
-                                   IServiceScope, 
+                                   IServiceScope,
+                                   IServiceProviderIsService,
                                    IDisposable
     {
         private IUnityContainer _container;
@@ -24,6 +25,7 @@ namespace Unity.Microsoft.DependencyInjection
             _container.RegisterInstance<IServiceScope>(this, new ExternallyControlledLifetimeManager());
             _container.RegisterInstance<IServiceProvider>(this, new ServiceProviderLifetimeManager(this));
             _container.RegisterInstance<IServiceScopeFactory>(this, new ExternallyControlledLifetimeManager());
+            _container.RegisterInstance<IServiceProviderIsService>(this, new ExternallyControlledLifetimeManager());
         }
 
         #region IServiceProvider
@@ -83,6 +85,16 @@ namespace Unity.Microsoft.DependencyInjection
         {
             return (UnityContainer)c._container;
         }
+
+        #endregion
+
+
+        #region IServiceProviderIsService
+
+        public bool IsService(Type serviceType)
+            => serviceType.IsGenericTypeDefinition 
+            ? false 
+            :  _container.CanResolve(serviceType);        
 
         #endregion
 
