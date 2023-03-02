@@ -92,9 +92,17 @@ namespace Unity.Microsoft.DependencyInjection
         #region IServiceProviderIsService
 
         public bool IsService(Type serviceType)
-            => serviceType.IsGenericTypeDefinition 
-            ? false 
-            :  _container.CanResolve(serviceType);        
+        {
+            if (serviceType.IsGenericType)
+            {
+                if (serviceType.IsGenericTypeDefinition)
+                    return false;
+
+                return _container.CanResolve(serviceType);
+            }
+            else
+                return _container.IsRegistered(serviceType);
+        }
 
         #endregion
 

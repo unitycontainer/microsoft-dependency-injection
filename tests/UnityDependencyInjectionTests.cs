@@ -17,7 +17,7 @@ namespace Unity.Microsoft.DependencyInjection.Specification.Tests
         }
 
         [Fact]
-        public void FixedResolvesMixedOpenClosedGenericsAsEnumerable()
+        public new void ResolvesMixedOpenClosedGenericsAsEnumerable()
         {
             // Arrange
             var serviceCollection = new TestServiceCollection();
@@ -44,54 +44,31 @@ namespace Unity.Microsoft.DependencyInjection.Specification.Tests
             Assert.IsType<FakeService>(enumerable[0]);
         }
 
-        [Fact]
-        public new void ResolvesMixedOpenClosedGenericsAsEnumerable()
-        {
-            // Arrange
-            var serviceCollection = new TestServiceCollection();
-            var instance = new FakeOpenGenericService<PocoClass>(null);
+        //[Fact]
+        //public void OriginalResolvesMixedOpenClosedGenericsAsEnumerable()
+        //{
+        //    // Arrange
+        //    var serviceCollection = new TestServiceCollection();
+        //    var instance = new FakeOpenGenericService<PocoClass>(null);
 
-            serviceCollection.AddTransient<PocoClass, PocoClass>();
-            serviceCollection.AddSingleton(typeof(IFakeOpenGenericService<PocoClass>), typeof(FakeService));
-            serviceCollection.AddSingleton(typeof(IFakeOpenGenericService<>), typeof(FakeOpenGenericService<>));
-            serviceCollection.AddSingleton<IFakeOpenGenericService<PocoClass>>(instance);
+        //    serviceCollection.AddTransient<PocoClass, PocoClass>();
+        //    serviceCollection.AddSingleton(typeof(IFakeOpenGenericService<PocoClass>), typeof(FakeService));
+        //    serviceCollection.AddSingleton(typeof(IFakeOpenGenericService<>), typeof(FakeOpenGenericService<>));
+        //    serviceCollection.AddSingleton<IFakeOpenGenericService<PocoClass>>(instance);
 
-            var serviceProvider = CreateServiceProvider(serviceCollection);
+        //    var serviceProvider = CreateServiceProvider(serviceCollection);
 
-            var enumerable = serviceProvider.GetService<IEnumerable<IFakeOpenGenericService<PocoClass>>>().ToArray();
+        //    var enumerable = serviceProvider.GetService<IEnumerable<IFakeOpenGenericService<PocoClass>>>().ToArray();
 
-            // Assert
-            Assert.Equal(3, enumerable.Length);
-            Assert.NotNull(enumerable[0]);
-            Assert.NotNull(enumerable[1]);
-            Assert.NotNull(enumerable[2]);
+        //    // Assert
+        //    Assert.Equal(3, enumerable.Length);
+        //    Assert.NotNull(enumerable[0]);
+        //    Assert.NotNull(enumerable[1]);
+        //    Assert.NotNull(enumerable[2]);
 
-            Assert.Equal(instance, enumerable[2]);
-            Assert.IsType<FakeService>(enumerable[0]);
-        }
-
-
-        [Fact]
-        public new void ExplictServiceRegisterationWithIsService()
-        {
-            if (!SupportsIServiceProviderIsService)
-            {
-                return;
-            }
-
-            // Arrange
-            var collection = new TestServiceCollection();
-            collection.AddTransient(typeof(IFakeService), typeof(FakeService));
-            var provider = CreateServiceProvider(collection);
-
-            // Act
-            var serviceProviderIsService = provider.GetService<IServiceProviderIsService>();
-
-            // Assert
-            Assert.NotNull(serviceProviderIsService);
-            Assert.True(serviceProviderIsService.IsService(typeof(IFakeService)));
-            Assert.False(serviceProviderIsService.IsService(typeof(FakeService)));
-        }
+        //    Assert.Equal(instance, enumerable[2]);
+        //    Assert.IsType<FakeService>(enumerable[0]);
+        //}
 
     }
 
