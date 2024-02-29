@@ -5,10 +5,11 @@ using Unity.Microsoft.DependencyInjection.Lifetime;
 
 namespace Unity.Microsoft.DependencyInjection
 {
-    public class ServiceProvider : IServiceProvider, 
+    public class ServiceProvider : IServiceProvider,
                                    ISupportRequiredService,
-                                   IServiceScopeFactory, 
-                                   IServiceScope, 
+                                   IKeyedServiceProvider,
+                                   IServiceScopeFactory,
+                                   IServiceScope,
                                    IDisposable
     {
         private IUnityContainer _container;
@@ -23,28 +24,32 @@ namespace Unity.Microsoft.DependencyInjection
             _container = container;
             _container.RegisterInstance<IServiceScope>(this, new ExternallyControlledLifetimeManager());
             _container.RegisterInstance<IServiceProvider>(this, new ServiceProviderLifetimeManager(this));
-            _container.RegisterInstance<IServiceScopeFactory>(this, new ExternallyControlledLifetimeManager());
+            _container.RegisterInstance<ISupportRequiredService>(this, new ExternallyControlledLifetimeManager());
+            _container.RegisterInstance<IKeyedServiceProvider>(this, new ExternallyControlledLifetimeManager());
+
+            if (container.IsRegistered<IServiceScopeFactory>() == false)
+                _container.RegisterInstance<IServiceScopeFactory>(this, new ExternallyControlledLifetimeManager());
         }
 
         #region IServiceProvider
 
         public object GetService(Type serviceType)
         {
-            if (null == _container) 
+            if (null == _container)
                 throw new ObjectDisposedException(nameof(IServiceProvider));
 
             try
             {
                 return _container.Resolve(serviceType, null);
             }
-            catch  { /* Ignore */}
+            catch { /* Ignore */}
 
             return null;
         }
 
         public object GetRequiredService(Type serviceType)
         {
-            if (null == _container) 
+            if (null == _container)
                 throw new ObjectDisposedException(nameof(IServiceProvider));
 
             return _container.Resolve(serviceType, null);
@@ -58,6 +63,32 @@ namespace Unity.Microsoft.DependencyInjection
         public IServiceScope CreateScope()
         {
             return new ServiceProvider(_container.CreateChildContainer());
+        }
+
+        #endregion
+
+        #region IKeyedServiceProvider
+
+        public object GetKeyedService(Type serviceType, object serviceKey)
+        {
+            if (null == _container)
+                throw new ObjectDisposedException(nameof(IServiceProvider));
+
+            return _container.Resolve(serviceType, (string)serviceKey, null);
+        }
+
+        public object GetRequiredKeyedService(Type serviceType, object serviceKey)
+        {
+            if (null == _container)
+                throw new ObjectDisposedException(nameof(IServiceProvider));
+
+            try
+            {
+                return _container.Resolve(serviceType, (string)serviceKey, null);
+            }
+            catch { /* Ignore */}
+
+            return null;
         }
 
         #endregion
@@ -101,6 +132,7 @@ namespace Unity.Microsoft.DependencyInjection
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
 
         #endregion
     }
