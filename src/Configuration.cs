@@ -27,36 +27,75 @@ namespace Unity.Microsoft.DependencyInjection
         internal static void Register(this IUnityContainer container,
             ServiceDescriptor serviceDescriptor, ILifetimeContainer lifetime)
         {
-            if (serviceDescriptor.ImplementationType != null)
+            if (serviceDescriptor.IsKeyedService)
             {
-                var name = serviceDescriptor.ServiceType.IsGenericTypeDefinition ? UnityContainer.All : null;
-                container.RegisterType(serviceDescriptor.ServiceType,
-                                       serviceDescriptor.ImplementationType,
-                                       name,
-                                       (ITypeLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
-            }
-            else if (serviceDescriptor.ImplementationFactory != null)
-            {
-                container.RegisterFactory(serviceDescriptor.ServiceType, 
-                                        null,
-                                        scope =>
-                                        {
-                                            var serviceProvider = scope.Resolve<IServiceProvider>();
-                                            var instance = serviceDescriptor.ImplementationFactory(serviceProvider);
-                                            return instance;
-                                        },
-                                       (IFactoryLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
-            }
-            else if (serviceDescriptor.ImplementationInstance != null)
-            {
-                container.RegisterInstance(serviceDescriptor.ServiceType,
-                                           null,
-                                           serviceDescriptor.ImplementationInstance,
-                                           (IInstanceLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
+                if (serviceDescriptor.KeyedImplementationType != null)
+                {
+                    var name = (string)serviceDescriptor.ServiceKey;
+                    container.RegisterType(serviceDescriptor.ServiceType,
+                                           serviceDescriptor.KeyedImplementationType,
+                                           name,
+                                           (ITypeLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
+                }
+                else if (serviceDescriptor.KeyedImplementationFactory != null)
+                {
+                    var name = (string)serviceDescriptor.ServiceKey;
+                    container.RegisterFactory(serviceDescriptor.ServiceType,
+                            name,
+                            scope =>
+                            {
+                                var serviceProvider = scope.Resolve<IServiceProvider>();
+                                var instance = serviceDescriptor.KeyedImplementationFactory(serviceProvider, name);
+                                return instance;
+                            },
+                           (IFactoryLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
+                }
+                else if (serviceDescriptor.KeyedImplementationInstance != null)
+                {
+                    var name = (string)serviceDescriptor.ServiceKey;
+                    container.RegisterInstance(serviceDescriptor.ServiceType,
+                               name,
+                               serviceDescriptor.KeyedImplementationInstance,
+                               (IInstanceLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
+                }
+                else
+                {
+                    throw new InvalidOperationException("Unsupported keyed registration type");
+                }
             }
             else
             {
-                throw new InvalidOperationException("Unsupported registration type");
+                if (serviceDescriptor.ImplementationType != null)
+                {
+                    var name = serviceDescriptor.ServiceType.IsGenericTypeDefinition ? UnityContainer.All : null;
+                    container.RegisterType(serviceDescriptor.ServiceType,
+                                           serviceDescriptor.ImplementationType,
+                                           name,
+                                           (ITypeLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
+                }
+                else if (serviceDescriptor.ImplementationFactory != null)
+                {
+                    container.RegisterFactory(serviceDescriptor.ServiceType,
+                                            null,
+                                            scope =>
+                                            {
+                                                var serviceProvider = scope.Resolve<IServiceProvider>();
+                                                var instance = serviceDescriptor.ImplementationFactory(serviceProvider);
+                                                return instance;
+                                            },
+                                           (IFactoryLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
+                }
+                else if (serviceDescriptor.ImplementationInstance != null)
+                {
+                    container.RegisterInstance(serviceDescriptor.ServiceType,
+                                               null,
+                                               serviceDescriptor.ImplementationInstance,
+                                               (IInstanceLifetimeManager)serviceDescriptor.GetLifetime(lifetime));
+                }
+                else
+                {
+                    throw new InvalidOperationException("Unsupported registration type");
+                }
             }
         }
 
